@@ -1,9 +1,7 @@
 ﻿using Auth.API.Consumer;
-using Auth.BusinessLayer.Models;
+using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Services;
-using Marvelous.Contracts.Enums;
 using MassTransit;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 
@@ -14,6 +12,8 @@ public static class BuilderServicesExtensions
     public static void RegisterServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        
+        services.AddScoped<IRequestHelper, RequestHelper>();
     }
 
     public static void RegisterSwaggerGen(this IServiceCollection services)
@@ -32,31 +32,6 @@ public static class BuilderServicesExtensions
                         Url = new Uri("https://github.com/Stepa28/Auth")
                     }
                 });
-
-            /*config.AddSecurityDefinition("Bearer",
-                new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    Description = "JWT Authorization header using the Bearer scheme."
-
-                });
-            config.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    new string[] {}
-                }
-            });*/
         });
     }
 
@@ -76,6 +51,7 @@ public static class BuilderServicesExtensions
         services.AddMassTransit(x =>
         {
             x.AddConsumer<CrmAddLeadOrChangePasswordConsumer>();
+            x.AddConsumer<AccountCheckingChangeRole>();
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host("rabbitmq://localhost",
@@ -84,19 +60,17 @@ public static class BuilderServicesExtensions
                         hst.Username("nafanya");
                         hst.Password("qwe!23");
                     });
-                cfg.ReceiveEndpoint("leadAddAuthQueue", e =>
+                cfg.ReceiveEndpoint("leadAddOrChangeAuthQueue", e =>
                 {
                     e.PurgeOnStartup = true;
                     e.ConfigureConsumer<CrmAddLeadOrChangePasswordConsumer>(context);
                 });
+                cfg.ReceiveEndpoint("leadChangeRoleQueue", e =>
+                {
+                    e.PurgeOnStartup = true;
+                    e.ConfigureConsumer<AccountCheckingChangeRole>(context);
+                });
             });
         });
-    }
-
-    public static void InitializationMamoryCash(this IMemoryCache memoryCache)
-    {
-        //TODO проработать логику инициализации
-        memoryCache.Set("321@example.com",
-            new LeadAuthModel { Id = 1, HashPassword = "1000:Sh979Zdl5gKkAXdniuIV3ZCkZXvL94Vk:GwKwxRlEMwdEIvEHLKxiV03s+W8=", Role = Role.Admin });
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Auth.BusinessLayer.Models;
 
-public class LeadAuthModel
+public struct LeadAuthModel
 {
     public int Id { get; set; }
     public Role Role { get; set; }
