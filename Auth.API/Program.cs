@@ -1,5 +1,6 @@
 using Auth.API.Extensions;
 using Auth.API.Infrastructure;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 var _logDirectoryVariableName = "LOG_DIRECTORY";
@@ -17,18 +18,18 @@ var config = new ConfigurationBuilder()
 
 builder.Services.RegisterServices();
 builder.Services.RegisterLogger(config);
-builder.Services.AddMassTransit();
 builder.Services.AddMemoryCache();
+builder.Services.AddMassTransit();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
-//запустить инициализацию кеша
+//запуск инициализации кеша
+app.Services.GetRequiredService<IMemoryCache>().InitializationMamoryCash();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
-app.UseAuthorization();
-app.UseAuthorization();
 app.UseMiddleware<ErrorExceptionMiddleware>();
 app.MapControllers();
 app.Run();

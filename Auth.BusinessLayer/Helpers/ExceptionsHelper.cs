@@ -13,8 +13,8 @@ public static class ExceptionsHelper
     {
         if (lead is null)
         {
-            _logger.Error($"Oshibka poiska. Lead c {email} ne naiden");
-            throw new NotFoundException($"Lead с {email} не найден");
+            _logger.Error($"Oshibka poiska. Lead c email: {email} ne naiden");
+            throw new NotFoundException($"Lead с email: {email} не найден");
         }
     }
 

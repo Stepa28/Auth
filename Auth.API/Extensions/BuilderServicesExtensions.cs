@@ -1,5 +1,9 @@
-﻿using Auth.BusinessLayer.Services;
+﻿using Auth.API.Consumer;
+using Auth.BusinessLayer.Models;
+using Auth.BusinessLayer.Services;
+using Marvelous.Contracts.Enums;
 using MassTransit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 
@@ -71,7 +75,7 @@ public static class BuilderServicesExtensions
     {
         services.AddMassTransit(x =>
         {
-            //x.AddConsumer<LeadConsumer>();
+            x.AddConsumer<CrmAddLeadOrChangePasswordConsumer>();
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host("rabbitmq://localhost",
@@ -80,11 +84,19 @@ public static class BuilderServicesExtensions
                         hst.Username("nafanya");
                         hst.Password("qwe!23");
                     });
-                /*cfg.ReceiveEndpoint("leadCRMQueue", e =>
+                cfg.ReceiveEndpoint("leadAddAuthQueue", e =>
                 {
-                    e.ConfigureConsumer<LeadConsumer>(context);
-                });*/
+                    e.PurgeOnStartup = true;
+                    e.ConfigureConsumer<CrmAddLeadOrChangePasswordConsumer>(context);
+                });
             });
         });
+    }
+
+    public static void InitializationMamoryCash(this IMemoryCache memoryCache)
+    {
+        //TODO проработать логику инициализации
+        memoryCache.Set("321@example.com",
+            new LeadAuthModel { Id = 1, HashPassword = "1000:Sh979Zdl5gKkAXdniuIV3ZCkZXvL94Vk:GwKwxRlEMwdEIvEHLKxiV03s+W8=", Role = Role.Admin });
     }
 }

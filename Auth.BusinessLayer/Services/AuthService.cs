@@ -36,8 +36,8 @@ public class AuthService : IAuthService
         };
         _logger.LogInformation($"Polu4enie tokena pol'zovatelya c email = {email.Encryptor()}.");
         var jwt = new JwtSecurityToken(
-            AuthOptions.Issuer, //для каждого сервиса свой(кто издал)
-            AuthOptions.Audience, //для каждого сервиса свой(для кого)
+            AuthOptions.Issuer, //TODO для каждого сервиса свой(кто издал)
+            AuthOptions.Audience, //TODO для каждого сервиса свой(для кого)
             claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));

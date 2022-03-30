@@ -7,12 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Consumer" />
         <Folder Include="Models\Request" />
         <Folder Include="Models\Response" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="11.0.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="Marvelous.Contracts" Version="1.1.13" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />

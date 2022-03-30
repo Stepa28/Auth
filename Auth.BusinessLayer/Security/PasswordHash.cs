@@ -4,12 +4,12 @@ namespace Auth.BusinessLayer.Security;
 
 public class PasswordHash
 {
-    public const int SaltByteSize = 24;
-    public const int HashByteSize = 20;
-    public const int Pbkdf2Iterations = 1000;
-    public const int IterationIndex = 0;
-    public const int SaltIndex = 1;
-    public const int Pbkdf2Index = 2;
+    private const int SaltByteSize = 24;
+    private const int HashByteSize = 20;
+    private const int Pbkdf2Iterations = 1000;
+    private const int IterationIndex = 0;
+    private const int SaltIndex = 1;
+    private const int Pbkdf2Index = 2;
 
     public static string HashPassword(string password)
     {
