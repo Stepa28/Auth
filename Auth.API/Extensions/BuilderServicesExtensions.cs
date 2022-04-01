@@ -1,5 +1,6 @@
-﻿using Auth.API.Consumer;
+﻿using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
+using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
 using MassTransit;
 using Microsoft.OpenApi.Models;
@@ -14,6 +15,7 @@ public static class BuilderServicesExtensions
         services.AddScoped<IAuthService, AuthService>();
         
         services.AddScoped<IRequestHelper, RequestHelper>();
+        services.AddScoped<IAuthProducer, AuthProducer>();
     }
 
     public static void RegisterSwaggerGen(this IServiceCollection services)
@@ -50,20 +52,14 @@ public static class BuilderServicesExtensions
     {
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<CrmAddLeadOrChangePasswordConsumer>();
+            x.AddConsumer<CrmAddOrChangeLeadConsumer>();
             x.AddConsumer<AccountCheckingChangeRole>();
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host("rabbitmq://localhost",
-                    hst =>
-                    {
-                        hst.Username("nafanya");
-                        hst.Password("qwe!23");
-                    });
                 cfg.ReceiveEndpoint("leadAddOrChangeAuthQueue", e =>
                 {
                     e.PurgeOnStartup = true;
-                    e.ConfigureConsumer<CrmAddLeadOrChangePasswordConsumer>(context);
+                    e.ConfigureConsumer<CrmAddOrChangeLeadConsumer>(context);
                 });
                 cfg.ReceiveEndpoint("leadChangeRoleQueue", e =>
                 {

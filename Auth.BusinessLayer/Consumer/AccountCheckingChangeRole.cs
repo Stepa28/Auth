@@ -2,11 +2,12 @@
 using Marvelous.Contracts.ExchangeModels;
 using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Auth.API.Consumer;
+namespace Auth.BusinessLayer.Consumer;
 
-public class AccountCheckingChangeRole : IConsumer<List<LeadShortExchangeModel>>
+public class AccountCheckingChangeRole : IConsumer<LeadShortExchangeModel[]>
 {
     private readonly ILogger<AccountCheckingChangeRole> _logger;
     private readonly IMemoryCache _cache;
@@ -17,13 +18,13 @@ public class AccountCheckingChangeRole : IConsumer<List<LeadShortExchangeModel>>
         _cache = cache;
     }
 
-    public Task Consume(ConsumeContext<List<LeadShortExchangeModel>> context)
+    public Task Consume(ConsumeContext<LeadShortExchangeModel[]> context)
     {
         _logger.LogInformation("Change role Leads");
         foreach (var lead in context.Message)
         {
             var tmp = _cache.Get<LeadAuthModel>(lead.Email);
-            if (tmp.HashPassword.IsNullOrEmpty())
+            if (tmp.HashPassword.IsNullOrEmpty() || tmp.Id == 0)
                 continue;
             tmp.Role = lead.Role;
             _cache.Set(lead.Email, tmp);
