@@ -33,7 +33,6 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Email, email), //TODO ??? нужен ли email в токене 
             new(ClaimTypes.UserData, entity.Id.ToString()),
             new(ClaimTypes.Role, entity.Role.ToString())
         };
