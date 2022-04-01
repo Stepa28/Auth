@@ -8,13 +8,13 @@ namespace Auth.API.Infrastructure;
 
 public class ErrorExceptionMiddleware
 {
-    private readonly ILogger<ErrorExceptionMiddleware> _logger;
+    private readonly Logger _logger;
     private readonly RequestDelegate _next;
 
-    public ErrorExceptionMiddleware(RequestDelegate next, ILogger<ErrorExceptionMiddleware> logger)
+    public ErrorExceptionMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
+        _logger = LogManager.GetCurrentClassLogger();
     }
 
     public async Task Invoke(HttpContext context)
@@ -37,7 +37,7 @@ public class ErrorExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
+            _logger.Error(ex);
             await ConstructResponse(context, HttpStatusCode.BadRequest, ex.Message);
         }
     }

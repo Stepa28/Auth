@@ -11,7 +11,7 @@ public static class ExceptionsHelper
 
     public static void ThrowIfEmailNotFound(string email, LeadAuthModel lead)
     {
-        if (lead is null)
+        if (lead.HashPassword is null || lead.Id == 0)
         {
             _logger.Error($"Oshibka poiska. Lead c email: {email} ne naiden");
             throw new NotFoundException($"Lead с email: {email} не найден");
