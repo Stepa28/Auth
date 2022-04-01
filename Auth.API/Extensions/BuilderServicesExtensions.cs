@@ -16,6 +16,7 @@ public static class BuilderServicesExtensions
         
         services.AddScoped<IRequestHelper, RequestHelper>();
         services.AddScoped<IAuthProducer, AuthProducer>();
+        services.AddScoped<IExceptionsHelper, ExceptionsHelper>();
     }
 
     public static void RegisterSwaggerGen(this IServiceCollection services)

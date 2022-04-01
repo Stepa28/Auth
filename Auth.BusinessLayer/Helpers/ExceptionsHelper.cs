@@ -1,29 +1,36 @@
 ﻿using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Security;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Auth.BusinessLayer.Helpers;
 
-public static class ExceptionsHelper
+public class ExceptionsHelper : IExceptionsHelper
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private const string NotFound = "Entity with e-mail = {0} not foun";
+    private const string PasswordIsIncorrected = "Incorrected password";
+    private readonly ILogger<ExceptionsHelper> _logger;
 
-    public static void ThrowIfEmailNotFound(string email, LeadAuthModel lead)
+    public ExceptionsHelper(ILogger<ExceptionsHelper> logger)
     {
-        if (lead.HashPassword is null || lead.Id == 0)
-        {
-            _logger.Error($"Oshibka poiska. Lead c email: {email} ne naiden");
-            throw new NotFoundException($"Lead с email: {email} не найден");
-        }
+        _logger = logger;
     }
 
-    public static void ThrowIfPasswordIsIncorrected(string pass, string hashPassFromBd)
+    public void ThrowIfEmailNotFound(string email, LeadAuthModel lead)
     {
-        if (!PasswordHash.ValidatePassword(pass, hashPassFromBd))
-        {
-            _logger.Error("Oshibka vvoda parolya. Vveden nevernyi parol'.");
-            throw new IncorrectPasswordException("Неверный пароль");
-        }
+        if (!lead.HashPassword.Equals(default) || lead.Id != default || lead.Role != default)
+            return;
+
+        _logger.LogError(string.Format(NotFound, email));
+        throw new NotFoundException(string.Format(NotFound, email));
+    }
+
+    public void ThrowIfPasswordIsIncorrected(string pass, string hashPassFromBd)
+    {
+        if (PasswordHash.ValidatePassword(pass, hashPassFromBd))
+            return;
+
+        _logger.LogError(PasswordIsIncorrected);
+        throw new IncorrectPasswordException(PasswordIsIncorrected);
     }
 }

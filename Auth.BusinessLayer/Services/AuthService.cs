@@ -14,19 +14,22 @@ public class AuthService : IAuthService
 {
     private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
+    private readonly IExceptionsHelper _exceptionsHelper;
 
-
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper)
     {
         _logger = logger;
         _cache = memoryCache;
+        _exceptionsHelper = exceptionsHelper;
     }
 
-    public async Task<string> GetToken(string email, string pass)
+    public Task<string> GetToken(string email, string pass)
     {
+        _logger.LogInformation($"Authorization attempt with email {email.Encryptor()}.");
+
         var entity = _cache.Get<LeadAuthModel>(email);
-        ExceptionsHelper.ThrowIfEmailNotFound(email, entity);
-        ExceptionsHelper.ThrowIfPasswordIsIncorrected(pass, entity.HashPassword);
+        _exceptionsHelper.ThrowIfEmailNotFound(email, entity);
+        _exceptionsHelper.ThrowIfPasswordIsIncorrected(pass, entity.HashPassword);
 
         var claims = new List<Claim>
         {
@@ -34,16 +37,18 @@ public class AuthService : IAuthService
             new(ClaimTypes.UserData, entity.Id.ToString()),
             new(ClaimTypes.Role, entity.Role.ToString())
         };
-        _logger.LogInformation($"Polu4enie tokena pol'zovatelya c email = {email.Encryptor()}.");
+
+        _logger.LogInformation($"Received a token for a lead with email {email.Encryptor()}.");
+
         var jwt = new JwtSecurityToken(
-            AuthOptions.Issuer, //TODO для каждого сервиса свой(кто издал)
+            AuthOptions.Issuer,   //TODO для каждого сервиса свой(кто издал)
             AuthOptions.Audience, //TODO для каждого сервиса свой(для кого)
             claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-        _logger.LogInformation($"Avtorizaciya pol'zovatelya c email = {email.Encryptor()} prohla uspehno.");
 
-        return new JwtSecurityTokenHandler().WriteToken(jwt);
+        _logger.LogInformation($"Authorization of lead with email {email.Encryptor()} was successful.");
 
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
     }
 }
