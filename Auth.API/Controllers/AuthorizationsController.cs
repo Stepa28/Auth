@@ -1,8 +1,8 @@
-﻿using Auth.BusinessLayer.Models;
+﻿using Auth.API.Extensions;
 using Auth.BusinessLayer.Security;
 using Auth.BusinessLayer.Services;
-using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.RequestModels;
+using Marvelous.Contracts.ResponseModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Swashbuckle.AspNetCore.Annotations;
@@ -27,20 +27,46 @@ public class AuthorizationsController : Controller
     //api/auth/login
     [HttpPost("login")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
     [SwaggerOperation("Get token")]
-    public async Task<ActionResult> Login([FromBody] AuthRequestModel auth)
+    public async Task<ActionResult<string>> Login([FromBody] AuthRequestModel auth)
     {
-        //var gg = (HttpContext.User.Identity as ClaimsIdentity)!.FindFirst("aud")!.Value; //вытаскивание Audience из токена
-        //var gg = (HttpContext.User.Identity as ClaimsIdentity)!.FindFirst("aud")!.Issuer; //вытаскивание Issuer из токена 
-        var service = _cache.Get<Dictionary<Microservice, MicroserviceModel>>(nameof(Microservice))
-                            .Values
-                            .Single(t => t.Ip == HttpContext.Connection.RemoteIpAddress!.ToString())
-                            .Microservice;
-        
-        _logger.LogInformation($"Poluchen zapros na authentikaciu po email = {auth.Email.Encryptor()}.");
-        var token = await _authService.GetToken(auth.Email, auth.Password, service);
-        _logger.LogInformation($"Authentikacia po email = {auth.Email.Encryptor()} proshhla uspeshno.");
-        
+        _logger.LogInformation($"Received a request to receive a token by email = {auth.Email.Encryptor()}");
+        var service = this.GetMicroserviceWhoUseEndpointByIp(_cache, _logger);
+        var token = await _authService.GetTokenForFront(auth.Email, auth.Password, service);
+        _logger.LogInformation("Token sent");
+
         return new JsonResult(token);
+    }
+
+    //api/auth/check-validate-token-microservices
+    [HttpGet("check-validate-token-microservices")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [SwaggerOperation("Check validate token among microservices")]
+    public async Task<ActionResult> CheckTokenAmongMicroservices()
+    {
+        var issuer = this.GetIssuerFromToken(_logger);
+        var audience = this.GetAudienceFromToken(_logger);
+        var service = this.GetMicroserviceWhoUseEndpointByIp(_cache, _logger);
+        await _authService.CheckValidTokenAmongMicroservices(issuer, audience, service);
+        return Ok();
+    }
+    
+    //api/auth/check-validate-token-front
+    [HttpGet("check-validate-token-front")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [SwaggerOperation("Check validate token among microservices")]
+    public async Task<ActionResult> CheckTokenFront()
+    {
+        var issuer = this.GetIssuerFromToken(_logger);
+        var audience = this.GetAudienceFromToken(_logger);
+        var service = this.GetMicroserviceWhoUseEndpointByIp(_cache, _logger);
+        await _authService.CheckValidTokenFront(issuer, audience, service);
+        return Ok();
     }
 }
