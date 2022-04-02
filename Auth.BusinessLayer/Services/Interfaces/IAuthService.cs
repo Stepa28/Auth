@@ -1,6 +1,8 @@
-﻿namespace Auth.BusinessLayer.Services;
+﻿using Marvelous.Contracts.Enums;
+
+namespace Auth.BusinessLayer.Services;
 
 public interface IAuthService
 {
-    Task<string> GetToken(string email, string pass);
+    Task<string> GetToken(string email, string pass, Microservice service);
 }

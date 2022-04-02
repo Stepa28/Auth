@@ -1,4 +1,5 @@
-﻿using Auth.BusinessLayer.Helpers;
+﻿using Auth.BusinessLayer.Exceptions;
+using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Producers;
 using AutoMapper;
@@ -14,6 +15,7 @@ namespace Auth.BusinessLayer.Services;
 
 public class InitializationService
 {
+    private const string Front = "Front"; //TODO убрать магические числа
     private readonly IRequestHelper _requestHelper;
     private readonly ILogger<InitializationService> _logger;
     private readonly IMapper _mapper;
@@ -31,13 +33,15 @@ public class InitializationService
 
     public void InitializeMamoryCash()
     {
+        InitializeMicroservices();
         var response = GetRestResponse(CrmUrls.Url, CrmUrls.Api + CrmUrls.Auth, Microservice.CRM).Result;
         if (response is null)
         {
             response = GetRestResponse(ReportingUrls.Url, ReportingUrls.ApiLeads + ReportingUrls.Auth, Microservice.MarvelousReportMicroService).Result;
             if (response is null)
             {
-                var message = $"Initialization with {Microservice.CRM} and {Microservice.MarvelousReportMicroService} failed";
+                var message =
+                    $"Initialization with {Microservice.CRM} and {Microservice.MarvelousReportMicroService} failed";
                 _logger.LogError(message);
                 _producer.NotifyFatalError(message);
                 return;
@@ -69,5 +73,41 @@ public class InitializationService
         }
 
         return response;
+    }
+
+    private void InitializeMicroservices()
+    {
+        var microservices = new Dictionary<Microservice, MicroserviceModel>();
+        ForbiddenMicroservices(microservices,
+            Microservice.Auth,
+            Microservice.MarvelousConfigs,
+            Microservice.RatesApi,
+            Microservice.workerServiceEmail,
+            Microservice.MarvelousAccountCheckingByChuZhig);
+
+        microservices.Add(Microservice.MarvelousService,
+            new MicroserviceModel("",
+                () => string.Join(",", Microservice.TransactionStore.ToString(), Microservice.CRM.ToString(), Front)!,
+                Microservice.MarvelousService));
+        
+        microservices.Add(Microservice.TransactionStore,
+            new MicroserviceModel("", () => Microservice.CRM.ToString(), Microservice.TransactionStore));
+        
+        microservices.Add(Microservice.CRM,
+            new MicroserviceModel("172.16.0.67", () => string.Join(",", Microservice.TransactionStore.ToString(), Front), Microservice.CRM));
+        
+        microservices.Add(Microservice.MarvelousReportMicroService,
+            new MicroserviceModel("172.16.0.232", () => Front, Microservice.MarvelousReportMicroService));
+
+        _cache.Set(nameof(Microservice), microservices);
+    }
+
+    private void ForbiddenMicroservices(IDictionary<Microservice, MicroserviceModel> microservices, params Microservice[] services)
+    {
+        foreach (var service in services)
+        {
+            string Forbidden() => throw new ForbiddenException($"{service.ToString()} service does not have the right to issue a token");
+            microservices.Add(service, new MicroserviceModel("", Forbidden, service));
+        }
     }
 }
