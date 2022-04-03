@@ -45,6 +45,12 @@ public class AuthService : IAuthService
         return Task.FromResult(FormationToken(service, claims));
     }
 
+    public Task<string> GetTokenForMicroservice(Microservice service)
+    {
+        _logger.LogInformation($"{service} service requested to receive a token for microservices");
+        return Task.FromResult(FormationToken(service));
+    }
+
     public Task CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
     {
         _logger.LogInformation($"Received a request to validate a microservices token from {service}");
@@ -64,7 +70,7 @@ public class AuthService : IAuthService
             throw ex;
         }
 
-        _logger.LogInformation("Verification was successful");
+        _logger.LogInformation("Verification token was successful");
         return Task.CompletedTask;
     }
 
@@ -86,7 +92,7 @@ public class AuthService : IAuthService
             throw ex;
         }
 
-        _logger.LogInformation("Verification was successful");
+        _logger.LogInformation("Verification token was successful");
         return Task.CompletedTask;
     }
 

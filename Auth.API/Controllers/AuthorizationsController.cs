@@ -36,7 +36,20 @@ public class AuthorizationsController : AdvancedController
         var token = await _authService.GetTokenForFront(auth.Email, auth.Password, Service);
         _logger.LogInformation("Token sent");
 
-        return new JsonResult(token);
+        return Ok(token);
+    }
+    
+    //api/auth/token-microservice"
+    [HttpGet("token-microservice")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [SwaggerOperation("Get a token for microservice")]
+    public async Task<ActionResult<string>> GetTokenForMicroservice()
+    {
+        var token = await _authService.GetTokenForMicroservice(Service);
+        _logger.LogInformation("Token sent");
+
+        return Ok(token);
     }
 
     //api/auth/check-validate-token-microservices
