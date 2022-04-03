@@ -5,6 +5,7 @@ namespace Auth.BusinessLayer.Configurations;
 
 public class AuthOptions
 {
+    //TODO удалить класс
     public const string Issuer = "BgkBack";    // издатель токена
     public const string Audience = "FrontEnd"; // потребитель токена
 

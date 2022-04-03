@@ -29,7 +29,7 @@ public class InitializationService
         _producer = producer;
     }
 
-    public void InitializeMamoryCash()
+    public void InitializeMamoryCash() //TODO через час запустить повторно 
     {
         var response = GetRestResponse(CrmUrls.Url, CrmUrls.Api + CrmUrls.Auth, Microservice.CRM).Result;
         if (response is null)
@@ -37,8 +37,9 @@ public class InitializationService
             response = GetRestResponse(ReportingUrls.Url, ReportingUrls.ApiLeads + ReportingUrls.Auth, Microservice.MarvelousReportMicroService).Result;
             if (response is null)
             {
-                var message = $"Initialization with {Microservice.CRM} and {Microservice.MarvelousReportMicroService} failed";
-                _logger.LogError(message);
+                var message =
+                    $"Initialization with {Microservice.CRM} and {Microservice.MarvelousReportMicroService} failed";
+                _logger.LogCritical(message);
                 _producer.NotifyFatalError(message);
                 return;
             }

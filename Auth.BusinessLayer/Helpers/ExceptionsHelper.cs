@@ -18,7 +18,7 @@ public class ExceptionsHelper : IExceptionsHelper
 
     public void ThrowIfEmailNotFound(string email, LeadAuthModel lead)
     {
-        if (!lead.HashPassword.Equals(default) || lead.Id != default || lead.Role != default)
+        if (!string.IsNullOrEmpty(lead.HashPassword) || lead.Id != default || lead.Role != default)
             return;
 
         _logger.LogError(string.Format(NotFound, email));

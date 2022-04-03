@@ -4,6 +4,7 @@ using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
 using AutoMapper;
+using Marvelous.Contracts.Enums;
 using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,7 @@ builder.Services.RegisterServices();
 builder.Services.RegisterLogger(config);
 builder.Services.AddMemoryCache();
 builder.Services.AddMassTransit();
+builder.Services.AddCustomAuth();
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
@@ -34,11 +36,17 @@ new InitializationService(new RequestHelper(),
     app.Services.GetRequiredService<IMapper>(),
     app.Services.GetRequiredService<IMemoryCache>(),
     app.Services.CreateScope().ServiceProvider.GetRequiredService<IAuthProducer>()).InitializeMamoryCash();
+
+//запуск инициализации моделей микросервисов
+app.Services.GetRequiredService<IMemoryCache>().GetOrCreate(nameof(Microservice),
+    new InitializeMicroserviceModels(app.Services.GetRequiredService<ILogger<InitializeMicroserviceModels>>())
+        .InitializeMicroservices);
 GC.Collect();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseMiddleware<ErrorExceptionMiddleware>();
 app.MapControllers();
 app.Run();

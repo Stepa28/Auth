@@ -1,8 +1,11 @@
-﻿using Auth.BusinessLayer.Consumer;
+﻿using Auth.BusinessLayer.Configurations;
+using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 
@@ -13,10 +16,26 @@ public static class BuilderServicesExtensions
     public static void RegisterServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
-        
+
         services.AddScoped<IRequestHelper, RequestHelper>();
         services.AddScoped<IAuthProducer, AuthProducer>();
         services.AddScoped<IExceptionsHelper, ExceptionsHelper>();
+    }
+
+    public static void AddCustomAuth(this IServiceCollection services)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true
+                    };
+                });
     }
 
     public static void RegisterSwaggerGen(this IServiceCollection services)
@@ -35,6 +54,28 @@ public static class BuilderServicesExtensions
                         Url = new Uri("https://github.com/Stepa28/Auth")
                     }
                 });
+            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme."
+            });
+            config.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] {}
+                }
+            });
         });
     }
 
