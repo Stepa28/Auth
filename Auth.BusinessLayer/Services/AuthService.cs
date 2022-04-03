@@ -18,6 +18,7 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
     private readonly IExceptionsHelper _exceptionsHelper;
+    private const string Front = "Front"; //TODO убрать магические числа
 
     public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper)
     {
@@ -67,26 +68,31 @@ public class AuthService : IAuthService
         return Task.CompletedTask;
     }
 
-    public Task CheckValidTokenFront(string issuerToken, string audienceToken, Microservice service)
+    public Task CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
     {
-        _logger.LogInformation("Front token validation request received");
+        _logger.LogInformation("Frontend token validation request received");
         if (!issuerToken.Equals(service.ToString()))
         {
             var ex = new BadRequestException("Broken token");
             _logger.LogError(ex, $"The token was not issued for {service} service");
             throw ex;
         }
-        
+
         var audiencesFromToken = Regex.Split(audienceToken, ",");
-        if (!audiencesFromToken.Contains("Front")) //TODO магические числа
+        if (!audiencesFromToken.Contains(Front))
         {
-            var ex = new ForbiddenException($"{"Front"}does not have access"); //TODO магические числа
-            _logger.LogError(ex, $"The token was not issued for {"Front"}");
+            var ex = new ForbiddenException($"{Front} does not have access");
+            _logger.LogError(ex, $"The token was not issued for {Front}");
             throw ex;
         }
-        
+
         _logger.LogInformation("Verification was successful");
         return Task.CompletedTask;
+    }
+
+    public Task<string> GetHashPassword(string password)
+    {
+        return Task.FromResult(PasswordHash.HashPassword(password));
     }
 
     private string FormationToken(Microservice issuerService, IEnumerable<Claim>? claims = null)
@@ -102,6 +108,6 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
 
-    private Dictionary<Microservice, MicroserviceModel> Microservices => 
+    private Dictionary<Microservice, MicroserviceModel> Microservices =>
         _cache.GetOrCreate(nameof(Microservice), new InitializeMicroserviceModels(_logger).InitializeMicroservices);
 }

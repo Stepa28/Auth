@@ -35,7 +35,7 @@ public class InitializeMicroserviceModels
             new MicroserviceModel("", () => Microservice.CRM.ToString(), Microservice.TransactionStore));
         
         microservices.Add(Microservice.CRM,
-            new MicroserviceModel("::1", () => string.Join(",", Microservice.TransactionStore.ToString(), Front), Microservice.CRM));
+            new MicroserviceModel("::1", () => string.Join(",", Microservice.TransactionStore.ToString(), Microservice.Auth.ToString(), Front), Microservice.CRM));
         
         microservices.Add(Microservice.MarvelousReportMicroService,
             new MicroserviceModel("", () => Front, Microservice.MarvelousReportMicroService));
