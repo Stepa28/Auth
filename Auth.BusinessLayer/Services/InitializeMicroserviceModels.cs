@@ -20,7 +20,6 @@ public class InitializeMicroserviceModels
     {
         var microservices = new Dictionary<Microservice, MicroserviceModel>();
         ForbiddenMicroservices(microservices,
-            Microservice.Auth,
             Microservice.MarvelousConfigs,
             Microservice.RatesApi,
             Microservice.workerServiceEmail,
@@ -28,7 +27,7 @@ public class InitializeMicroserviceModels
 
         microservices.Add(Microservice.MarvelousService,
             new MicroserviceModel("",
-                () => string.Join(",", Microservice.TransactionStore.ToString(), Microservice.CRM.ToString(), Front)!,
+                () => string.Join(",", Microservice.TransactionStore.ToString(), Microservice.CRM.ToString(), Front),
                 Microservice.MarvelousService));
         
         microservices.Add(Microservice.TransactionStore,
@@ -39,6 +38,9 @@ public class InitializeMicroserviceModels
         
         microservices.Add(Microservice.MarvelousReportMicroService,
             new MicroserviceModel("", () => Front, Microservice.MarvelousReportMicroService));
+        
+        microservices.Add(Microservice.Auth,
+            new MicroserviceModel("", () => string.Join(",", Microservice.CRM.ToString(), Microservice.MarvelousReportMicroService.ToString()), Microservice.Auth));
 
         return microservices;
     }

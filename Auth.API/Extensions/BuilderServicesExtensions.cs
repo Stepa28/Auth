@@ -3,11 +3,14 @@ using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
+using AutoMapper;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
+using Timer = System.Timers.Timer;
 
 namespace Auth.API.Extensions;
 
@@ -54,7 +57,7 @@ public static class BuilderServicesExtensions
                         Url = new Uri("https://github.com/Stepa28/Auth")
                     }
                 });
-            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
                 Type = SecuritySchemeType.Http,
@@ -110,5 +113,20 @@ public static class BuilderServicesExtensions
                 });
             });
         });
+    }
+
+    public static async void InitializationLeads(this WebApplication app)
+    {
+        var tmp = new InitializationService(new RequestHelper(),
+            app.Services.GetRequiredService<ILogger<InitializationService>>(),
+            app.Services.GetRequiredService<IMapper>(),
+            app.Services.GetRequiredService<IMemoryCache>(),
+            app.Services.CreateScope().ServiceProvider.GetRequiredService<IAuthProducer>(),
+            app.Services.CreateScope().ServiceProvider.GetRequiredService<IAuthService>());
+
+        var timer = new Timer(3600000) { AutoReset = false };
+        timer.Elapsed += async (sender, e) => await tmp.InitializeMamoryCashAsync(timer);
+
+        await tmp.InitializeMamoryCashAsync(timer);
     }
 }

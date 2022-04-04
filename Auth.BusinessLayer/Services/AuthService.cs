@@ -29,6 +29,13 @@ public class AuthService : IAuthService
 
     public Task<string> GetTokenForFront(string email, string pass, Microservice service)
     {
+        if (!_cache.Get<bool>("Initialization"))
+        {
+            var ex = new BadRequestException("Microservice initialization was not completed");
+            _logger.LogError(ex, "");
+            throw ex;
+        }
+
         _logger.LogInformation($"Authorization attempt with email = {email.Encryptor()}({service})");
 
         var entity = _cache.Get<LeadAuthModel>(email);
