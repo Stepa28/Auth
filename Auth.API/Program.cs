@@ -27,13 +27,13 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
-//запуск инициализации кеша лидов
-app.InitializationLeads();
-
 //запуск инициализации моделей микросервисов
 app.Services.GetRequiredService<IMemoryCache>().GetOrCreate(nameof(Microservice),
     (ICacheEntry _) => new InitializeMicroserviceModels(app.Services.GetRequiredService<ILogger<InitializeMicroserviceModels>>())
         .InitializeMicroservices());
+
+//запуск инициализации кеша лидов
+app.InitializationLeads();
 
 app.UseSwagger();
 app.UseSwaggerUI();

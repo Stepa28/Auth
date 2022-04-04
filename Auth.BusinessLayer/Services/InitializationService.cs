@@ -69,7 +69,7 @@ public class InitializationService
         RestResponse? response = null;
         try
         {
-            response = await _requestHelper.SendRequest(url, path, Method.Get, token, service);
+            response = await _requestHelper.SendRequestWithTokenAsync(url, path, Method.Get, service, token);
         }
         catch (Exception ex)
         {

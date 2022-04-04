@@ -18,9 +18,9 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
     private readonly IExceptionsHelper _exceptionsHelper;
-    private readonly InitializeMicroserviceModels _initializeModels;
+    private readonly IInitializeMicroserviceModels _initializeModels;
 
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, InitializeMicroserviceModels initializeModels)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IInitializeMicroserviceModels initializeModels)
     {
         _logger = logger;
         _cache = memoryCache;

@@ -9,13 +9,19 @@ namespace Auth.BusinessLayer.Helpers;
 public class RequestHelper : IRequestHelper
 {
 
-    public async Task<RestResponse> SendRequest(string url, string path, Method method, string jwtToken, Microservice service)
+    public async Task<RestResponse> SendRequestWithTokenAsync(string url, string path, Method method, Microservice service, string jwtToken)
     {
         var request = new RestRequest(path, method);
-        return await GenerateRequest(request, url,jwtToken, service);
+        return await GenerateRequest(request, url, service, jwtToken);
     }
 
-    private static async Task<RestResponse> GenerateRequest(RestRequest request, string url, string jwtToken, Microservice service)
+    public async Task<RestResponse> SendRequestAsync(string url, string path, Method method, Microservice service)
+    {
+        var request = new RestRequest(path, method);
+        return await GenerateRequest(request, url, service);
+    }
+
+    private static async Task<RestResponse> GenerateRequest(RestRequest request, string url, Microservice service, string jwtToken = "null")
     {
         var client = new RestClient(new RestClientOptions(url)
         {
