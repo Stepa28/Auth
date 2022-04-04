@@ -18,7 +18,7 @@ public class AuthorizationsController : AdvancedController
     private readonly ILogger<AuthorizationsController> _logger;
 
     public AuthorizationsController(IAuthService authService, ILogger<AuthorizationsController> logger,
-        IMemoryCache cache) : base(logger, cache)
+        IMemoryCache cache, IInitializeMicroserviceModels model) : base(logger, cache, model)
     {
         _authService = authService;
         _logger = logger;
@@ -85,7 +85,7 @@ public class AuthorizationsController : AdvancedController
     public async Task<ActionResult<string>> GetHashPassword([FromBody] string password)
     {
         _logger.LogInformation($"{Service} asked to hashing password");
-        await _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Microservice.Auth);
+        await _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Microservice.MarvelousAuth);
         var hash = await _authService.GetHashPassword(password);
         _logger.LogInformation("Hash password send");
         

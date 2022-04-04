@@ -16,17 +16,19 @@ public class AdvancedController : Controller
 
     private readonly ILogger _logger;
     private readonly IMemoryCache _cache;
+    private readonly IInitializeMicroserviceModels _initializeModels;
 
-    public AdvancedController(ILogger logger, IMemoryCache cache)
+    public AdvancedController(ILogger logger, IMemoryCache cache, IInitializeMicroserviceModels initializeModels)
     {
         _logger = logger;
         _cache = cache;
+        _initializeModels = initializeModels;
     }
 
     private Microservice GetMicroserviceWhoUseEndpointByIp()
     {
         var tmp = _cache.GetOrCreate(nameof(Microservice),
-                            new InitializeMicroserviceModels(_logger).InitializeMicroservices)
+                            (ICacheEntry _) => _initializeModels.InitializeMicroservices())
                         .Values
                         .FirstOrDefault(t => t.Ip == HttpContext.Connection.RemoteIpAddress!.ToString());
 

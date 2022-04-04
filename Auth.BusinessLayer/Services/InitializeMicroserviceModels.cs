@@ -1,46 +1,55 @@
 using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Models;
 using Marvelous.Contracts.Enums;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Auth.BusinessLayer.Services;
 
-public class InitializeMicroserviceModels
+public class InitializeMicroserviceModels : IInitializeMicroserviceModels
 {
-    private const string Front = "Front"; //TODO убрать магические числа
-    private readonly ILogger _logger;
+    private readonly ILogger<InitializeMicroserviceModels> _logger;
 
-    public InitializeMicroserviceModels(ILogger logger)
+    public InitializeMicroserviceModels(ILogger<InitializeMicroserviceModels> logger)
     {
         _logger = logger;
     }
 
-    public Dictionary<Microservice, MicroserviceModel> InitializeMicroservices(ICacheEntry _)
+    public Dictionary<Microservice, MicroserviceModel> InitializeMicroservices()
     {
         var microservices = new Dictionary<Microservice, MicroserviceModel>();
         ForbiddenMicroservices(microservices,
             Microservice.MarvelousConfigs,
-            Microservice.RatesApi,
-            Microservice.workerServiceEmail,
-            Microservice.MarvelousAccountCheckingByChuZhig);
+            Microservice.MarvelousRatesApi,
+            Microservice.MarvelousEmailSendler,
+            Microservice.MarvelousAccountChecking);
 
         microservices.Add(Microservice.MarvelousService,
             new MicroserviceModel("",
-                () => string.Join(",", Microservice.TransactionStore.ToString(), Microservice.CRM.ToString(), Front),
-                Microservice.MarvelousService));
-        
-        microservices.Add(Microservice.TransactionStore,
-            new MicroserviceModel("", () => Microservice.CRM.ToString(), Microservice.TransactionStore));
-        
-        microservices.Add(Microservice.CRM,
-            new MicroserviceModel("::1", () => string.Join(",", Microservice.TransactionStore.ToString(), Microservice.Auth.ToString(), Front), Microservice.CRM));
-        
-        microservices.Add(Microservice.MarvelousReportMicroService,
-            new MicroserviceModel("", () => Front, Microservice.MarvelousReportMicroService));
-        
-        microservices.Add(Microservice.Auth,
-            new MicroserviceModel("", () => string.Join(",", Microservice.CRM.ToString(), Microservice.MarvelousReportMicroService.ToString()), Microservice.Auth));
+                () => string.Join(",",
+                    Microservice.MarvelousTransactionStore.ToString(),
+                    Microservice.MarvelousCrm.ToString(),
+                    Frontend.MarvelousFrontendService.ToString()),
+                Microservice.MarvelousService) { Frontend = Frontend.MarvelousFrontendService });
+
+        microservices.Add(Microservice.MarvelousTransactionStore,
+            new MicroserviceModel("", () => Microservice.MarvelousCrm.ToString(), Microservice.MarvelousTransactionStore));
+
+        microservices.Add(Microservice.MarvelousCrm,
+            new MicroserviceModel("::1",
+                () => string.Join(",",
+                    Microservice.MarvelousTransactionStore.ToString(),
+                    Microservice.MarvelousAuth.ToString(),
+                    Frontend.MarvelousFrontendCrm.ToString()),
+                Microservice.MarvelousCrm) { Frontend = Frontend.MarvelousFrontendCrm });
+
+        microservices.Add(Microservice.MarvelousReporting,
+            new MicroserviceModel("", () => Frontend.MarvelousFrontendReporting.ToString(), Microservice.MarvelousReporting)
+                { Frontend = Frontend.MarvelousFrontendReporting });
+
+        microservices.Add(Microservice.MarvelousAuth,
+            new MicroserviceModel("",
+                () => string.Join(",", Microservice.MarvelousCrm.ToString(), Microservice.MarvelousReporting.ToString()),
+                Microservice.MarvelousAuth));
 
         return microservices;
     }
@@ -55,6 +64,7 @@ public class InitializeMicroserviceModels
                 _logger.LogError(ex, "");
                 throw ex;
             }
+
             microservices.Add(service, new MicroserviceModel("", Forbidden, service));
         }
     }

@@ -18,13 +18,14 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
     private readonly IExceptionsHelper _exceptionsHelper;
-    private const string Front = "Front"; //TODO убрать магические числа
+    private readonly InitializeMicroserviceModels _initializeModels;
 
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, InitializeMicroserviceModels initializeModels)
     {
         _logger = logger;
         _cache = memoryCache;
         _exceptionsHelper = exceptionsHelper;
+        _initializeModels = initializeModels;
     }
 
     public Task<string> GetTokenForFront(string email, string pass, Microservice service)
@@ -91,11 +92,12 @@ public class AuthService : IAuthService
             throw ex;
         }
 
+        var frontendFromService = Microservices[service].Frontend.ToString();
         var audiencesFromToken = Regex.Split(audienceToken, ",");
-        if (!audiencesFromToken.Contains(Front))
+        if (!audiencesFromToken.Contains(frontendFromService))
         {
-            var ex = new ForbiddenException($"{Front} does not have access");
-            _logger.LogError(ex, $"The token was not issued for {Front}");
+            var ex = new ForbiddenException($"{frontendFromService} does not have access");
+            _logger.LogError(ex, $"The token was not issued for {frontendFromService}");
             throw ex;
         }
 
@@ -122,5 +124,5 @@ public class AuthService : IAuthService
     }
 
     private Dictionary<Microservice, MicroserviceModel> Microservices =>
-        _cache.GetOrCreate(nameof(Microservice), new InitializeMicroserviceModels(_logger).InitializeMicroservices);
+        _cache.GetOrCreate(nameof(Microservice), (ICacheEntry _) => _initializeModels.InitializeMicroservices());
 }

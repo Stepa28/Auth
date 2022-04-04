@@ -24,7 +24,7 @@ public class AuthProducer : IAuthProducer
 
         await _bus.Publish<EmailErrorMessage>(new
         {
-            ServiceName = Microservice.Auth.ToString(),
+            ServiceName = Microservice.MarvelousAuth.ToString(),
             TextMessage = message
         }, source.Token);
         

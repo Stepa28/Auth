@@ -32,19 +32,18 @@ public class InitializationService
         _authService = authService;
     }
 
-    public async Task InitializeMamoryCashAsync(Timer timer)
+    public async Task InitializeMemoryCashAsync(Timer timer)
     {
         _cache.Set("Initialization", false);
-        var token = await _authService.GetTokenForMicroservice(Microservice.Auth);
+        var token = await _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
         
-        var response = await GetRestResponse("https://localhost:7295", CrmUrls.Api + CrmUrls.Auth, Microservice.CRM, token);
+        var response = await GetRestResponse(CrmUrls.Url, CrmUrls.LeadApi + CrmUrls.Auth, Microservice.MarvelousCrm, token);
         if (response is null)
         {
-            response = await GetRestResponse("ReportingUrls.Url", ReportingUrls.ApiLeads + ReportingUrls.Auth, Microservice.MarvelousReportMicroService, token);
+            response = await GetRestResponse(ReportingUrls.Url, ReportingUrls.ApiLeads + ReportingUrls.Auth, Microservice.MarvelousReporting, token);
             if (response is null)
             {
-                var message =
-                    $"Initialization with {Microservice.CRM} and {Microservice.MarvelousReportMicroService} failed";
+                var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
                 _logger.LogCritical(message);
                 await _producer.NotifyFatalError(message);
                 timer.Start();

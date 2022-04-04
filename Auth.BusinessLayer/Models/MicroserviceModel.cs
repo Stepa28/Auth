@@ -16,4 +16,5 @@ public class MicroserviceModel
     public string Ip { get; }
     public Microservice Microservice { get; }
     public string GetServicesThatHaveAccess() => _servicesThatHaveAccess();
+    public Frontend Frontend { get; set; }
 }

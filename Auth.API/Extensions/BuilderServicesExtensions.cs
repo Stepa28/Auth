@@ -23,6 +23,7 @@ public static class BuilderServicesExtensions
         services.AddScoped<IRequestHelper, RequestHelper>();
         services.AddScoped<IAuthProducer, AuthProducer>();
         services.AddScoped<IExceptionsHelper, ExceptionsHelper>();
+        services.AddScoped<IInitializeMicroserviceModels, InitializeMicroserviceModels>();
     }
 
     public static void AddCustomAuth(this IServiceCollection services)
@@ -76,7 +77,7 @@ public static class BuilderServicesExtensions
                             Id = "Bearer"
                         }
                     },
-                    new string[] {}
+                    Array.Empty<string>()
                 }
             });
         });
@@ -125,8 +126,8 @@ public static class BuilderServicesExtensions
             app.Services.CreateScope().ServiceProvider.GetRequiredService<IAuthService>());
 
         var timer = new Timer(3600000) { AutoReset = false };
-        timer.Elapsed += async (sender, e) => await tmp.InitializeMamoryCashAsync(timer);
+        timer.Elapsed += async (sender, e) => await tmp.InitializeMemoryCashAsync(timer);
 
-        await tmp.InitializeMamoryCashAsync(timer);
+        await tmp.InitializeMemoryCashAsync(timer);
     }
 }

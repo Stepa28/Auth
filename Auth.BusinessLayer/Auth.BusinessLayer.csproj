@@ -8,7 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="11.0.1" />
-        <PackageReference Include="Marvelous.Contracts" Version="1.1.19" />
+        <PackageReference Include="Marvelous.Contracts" Version="1.1.20" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />

@@ -32,8 +32,8 @@ app.InitializationLeads();
 
 //запуск инициализации моделей микросервисов
 app.Services.GetRequiredService<IMemoryCache>().GetOrCreate(nameof(Microservice),
-    new InitializeMicroserviceModels(app.Services.GetRequiredService<ILogger<InitializeMicroserviceModels>>())
-        .InitializeMicroservices);
+    (ICacheEntry _) => new InitializeMicroserviceModels(app.Services.GetRequiredService<ILogger<InitializeMicroserviceModels>>())
+        .InitializeMicroservices());
 
 app.UseSwagger();
 app.UseSwaggerUI();
