@@ -9,31 +9,25 @@ namespace Auth.BusinessLayer.Helpers;
 public class RequestHelper : IRequestHelper
 {
 
-    public async Task<RestResponse> SendRequestWithTokenAsync(string url, string path, Method method, Microservice service, string jwtToken)
+    public async Task<RestResponse<T>> SendRequestAsync<T>(string url, string path, Method method, Microservice service, string jwtToken)
     {
         var request = new RestRequest(path, method);
-        return await GenerateRequest(request, url, service, jwtToken);
+        return await GenerateRequest<T>(request, url, service, jwtToken);
     }
 
-    public async Task<RestResponse> SendRequestAsync(string url, string path, Method method, Microservice service)
-    {
-        var request = new RestRequest(path, method);
-        return await GenerateRequest(request, url, service);
-    }
-
-    private static async Task<RestResponse> GenerateRequest(RestRequest request, string url, Microservice service, string jwtToken = "null")
+    private static async Task<RestResponse<T>> GenerateRequest<T>(RestRequest request, string url, Microservice service, string jwtToken)
     {
         var client = new RestClient(new RestClientOptions(url)
         {
             Timeout = 300000
         });
         client.Authenticator = new JwtAuthenticator(jwtToken);
-        var response = await client.ExecuteAsync(request); //TODO дженерик
+        var response = await client.ExecuteAsync<T>(request);
         CheckTransactionError(response, service);
         return response;
     }
 
-    private static void CheckTransactionError(RestResponse response, Microservice service)
+    private static void CheckTransactionError<T>(RestResponse<T> response, Microservice service)
     {
         switch (response.StatusCode)
         {
@@ -46,7 +40,7 @@ public class RequestHelper : IRequestHelper
             default:
                 throw new BadGatewayException($"Error on {service}. {response.ErrorException!.Message}");
         }
-        if (response.Content == null)
+        if (response.Data is null)
             throw new BadGatewayException($"Content equal's null {response.ErrorException!.Message}");
     }
 }

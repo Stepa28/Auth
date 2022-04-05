@@ -7,7 +7,6 @@ using Marvelous.Contracts.ExchangeModels;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Marvelous.Contracts.Urls;
-using Newtonsoft.Json;
 using RestSharp;
 using Timer = System.Timers.Timer;
 
@@ -56,20 +55,20 @@ public class InitializationService : IInitializationService
             _logger.LogInformation("Initialization from service CRM: completed successfully");
         }
 
-        foreach (var entity in JsonConvert.DeserializeObject<IEnumerable<LeadAuthExchangeModel>>(response.Content!)!)
+        foreach (var entity in response.Data!)
         {
             _cache.Set(entity.Email, _mapper.Map<LeadAuthModel>(entity));
         }
         _cache.Set("Initialization", true);
     }
 
-    private async Task<RestResponse?> GetRestResponse(string url, string path, Microservice service, string token)
+    private async Task<RestResponse<IEnumerable<LeadAuthExchangeModel>>?> GetRestResponse(string url, string path, Microservice service, string token)
     {
         _logger.LogInformation($"Attempt to initialize from {service} service");
-        RestResponse? response = null;
+        RestResponse<IEnumerable<LeadAuthExchangeModel>>? response = null;
         try
         {
-            response = await _requestHelper.SendRequestWithTokenAsync(url, path, Method.Get, service, token);
+            response = await _requestHelper.SendRequestAsync<IEnumerable<LeadAuthExchangeModel>>(url, path, Method.Get, service, token);
         }
         catch (Exception ex)
         {

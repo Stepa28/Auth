@@ -5,6 +5,5 @@ namespace Auth.BusinessLayer.Helpers;
 
 public interface IRequestHelper
 {
-    Task<RestResponse> SendRequestWithTokenAsync(string url, string path, Method method, Microservice service, string jwtToken);
-    Task<RestResponse> SendRequestAsync(string url, string path, Method method, Microservice service);
+    Task<RestResponse<T>> SendRequestAsync<T>(string url, string path, Method method, Microservice service, string jwtToken);
 }
