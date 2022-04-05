@@ -4,6 +4,7 @@ using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.RequestModels;
 using Marvelous.Contracts.ResponseModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Swashbuckle.AspNetCore.Annotations;
@@ -27,8 +28,8 @@ public class AuthorizationsController : AdvancedController
     //api/auth/login
     [HttpPost("login")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status404NotFound)]
     [SwaggerOperation("Get a token for font and microservice")]
     public async Task<ActionResult<string>> Login([FromBody] AuthRequestModel auth)
     {
@@ -38,7 +39,7 @@ public class AuthorizationsController : AdvancedController
 
         return Ok(token);
     }
-    
+
     //api/auth/token-microservice"
     [HttpGet("token-microservice")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
@@ -54,9 +55,11 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/check-validate-token-microservices
     [HttpGet("check-validate-token-microservices")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate token among microservices")]
     public async Task<ActionResult> CheckTokenAmongMicroservices()
     {
@@ -66,9 +69,11 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/check-validate-token-front
     [HttpGet("check-validate-token-front")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate frontend token")]
     public async Task<ActionResult> CheckTokenFrontend()
     {
@@ -78,9 +83,11 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/hash-password
     [HttpPost("hash-password")]
+    [Authorize]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [SwaggerOperation("Hashing password")]
     public async Task<ActionResult<string>> GetHashPassword([FromBody] string password)
     {
@@ -88,7 +95,7 @@ public class AuthorizationsController : AdvancedController
         await _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Microservice.MarvelousAuth);
         var hash = await _authService.GetHashPassword(password);
         _logger.LogInformation("Hash password send");
-        
+
         return Ok(hash);
     }
 }

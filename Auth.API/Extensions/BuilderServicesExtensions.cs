@@ -40,6 +40,7 @@ public static class BuilderServicesExtensions
                         ValidateIssuerSigningKey = true
                     };
                 });
+        services.AddAuthorization();
     }
 
     public static void RegisterSwaggerGen(this IServiceCollection services)

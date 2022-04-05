@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Authentication;
 using System.Text.Json;
 using Auth.BusinessLayer.Exceptions;
 using Marvelous.Contracts.ResponseModels;
@@ -26,6 +27,10 @@ public class ErrorExceptionMiddleware
         catch (ForbiddenException error)
         {
             await ConstructResponse(context, HttpStatusCode.Forbidden, error.Message);
+        }
+        catch (AuthenticationException ex)
+        {
+            await ConstructResponse(context, HttpStatusCode.Unauthorized, ex.Message);
         }
         catch (NotFoundException error)
         {

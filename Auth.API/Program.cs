@@ -37,8 +37,9 @@ app.InitializationLeads();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseMiddleware<ErrorExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseMiddleware<ErrorExceptionMiddleware>();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();

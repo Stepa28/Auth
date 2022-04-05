@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Security.Principal;
 using Auth.BusinessLayer.Exceptions;
@@ -56,7 +57,7 @@ public class AdvancedController : Controller
     {
         if (userIdentity is not ClaimsIdentity identity)
         {
-            var ex = new BadRequestException("Broken token");
+            var ex = new AuthenticationException("Broken token");
             _logger.LogError(ex, "Token doesn't contain claims, possible expiration or incorrect secret key");
             throw ex;
         }
@@ -64,7 +65,7 @@ public class AdvancedController : Controller
         if (identity.FindFirst("aud") is not null)
             return identity.FindFirst("aud")!;
 
-        var e = new BadRequestException("Broken token");
+        var e = new AuthenticationException("Broken token");
         _logger.LogError(e, "Token doesn't contain audience");
         throw e;
     }
