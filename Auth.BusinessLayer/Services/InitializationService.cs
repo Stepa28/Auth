@@ -13,7 +13,7 @@ using Timer = System.Timers.Timer;
 
 namespace Auth.BusinessLayer.Services;
 
-public class InitializationService
+public class InitializationService : IInitializationService
 {
     private readonly IRequestHelper _requestHelper;
     private readonly ILogger<InitializationService> _logger;

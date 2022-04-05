@@ -3,10 +3,8 @@ using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
-using AutoMapper;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
@@ -24,6 +22,7 @@ public static class BuilderServicesExtensions
         services.AddScoped<IAuthProducer, AuthProducer>();
         services.AddScoped<IExceptionsHelper, ExceptionsHelper>();
         services.AddScoped<IInitializeMicroserviceModels, InitializeMicroserviceModels>();
+        services.AddTransient<IInitializationService, InitializationService>();
     }
 
     public static void AddCustomAuth(this IServiceCollection services)
@@ -119,16 +118,9 @@ public static class BuilderServicesExtensions
 
     public static async void InitializationLeads(this WebApplication app)
     {
-        var tmp = new InitializationService(new RequestHelper(),
-            app.Services.GetRequiredService<ILogger<InitializationService>>(),
-            app.Services.GetRequiredService<IMapper>(),
-            app.Services.GetRequiredService<IMemoryCache>(),
-            app.Services.CreateScope().ServiceProvider.GetRequiredService<IAuthProducer>(),
-            app.Services.CreateScope().ServiceProvider.GetRequiredService<IAuthService>());
-
         var timer = new Timer(3600000) { AutoReset = false };
-        timer.Elapsed += async (sender, e) => await tmp.InitializeMemoryCashAsync(timer);
+        timer.Elapsed += async (sender, e) => await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationService>().InitializeMemoryCashAsync(timer);
 
-        await tmp.InitializeMemoryCashAsync(timer);
+        await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationService>().InitializeMemoryCashAsync(timer);
     }
 }
