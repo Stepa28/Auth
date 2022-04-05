@@ -2,6 +2,7 @@
 using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Security;
 using Microsoft.Extensions.Logging;
+using static System.String;
 
 namespace Auth.BusinessLayer.Helpers;
 
@@ -18,11 +19,11 @@ public class ExceptionsHelper : IExceptionsHelper
 
     public void ThrowIfEmailNotFound(string email, LeadAuthModel lead)
     {
-        if (!string.IsNullOrEmpty(lead.HashPassword) || lead.Id != default || lead.Role != default)
+        if (!IsNullOrEmpty(lead.HashPassword) || lead.Id != default || lead.Role != default)
             return;
 
-        _logger.LogError(string.Format(NotFound, email));
-        throw new NotFoundException(string.Format(NotFound, email));
+        _logger.LogError(Format(NotFound, email));
+        throw new NotFoundException(Format(NotFound, email));
     }
 
     public void ThrowIfPasswordIsIncorrected(string pass, string hashPassFromBd)

@@ -31,7 +31,7 @@ public class AdvancedController : Controller
         var tmp = _cache.GetOrCreate(nameof(Microservice),
                             (ICacheEntry _) => _initializeModels.InitializeMicroservices())
                         .Values
-                        .FirstOrDefault(t => t.Ip == HttpContext.Connection.RemoteIpAddress!.ToString());
+                        .FirstOrDefault(t => t.Address == HttpContext.Connection.RemoteIpAddress!.ToString() + HttpContext.Connection.RemotePort);
 
         if (tmp is not null)
             return tmp.Microservice;

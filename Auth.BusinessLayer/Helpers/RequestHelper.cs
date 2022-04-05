@@ -28,7 +28,7 @@ public class RequestHelper : IRequestHelper
             Timeout = 300000
         });
         client.Authenticator = new JwtAuthenticator(jwtToken);
-        var response = await client.ExecuteAsync(request);
+        var response = await client.ExecuteAsync(request); //TODO дженерик
         CheckTransactionError(response, service);
         return response;
     }

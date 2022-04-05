@@ -7,8 +7,8 @@ namespace Auth.BusinessLayer.Producers;
 
 public class AuthProducer : IAuthProducer
 {
-    private IBus _bus;
-    private ILogger<AuthProducer> _logger;
+    private readonly IBus _bus;
+    private readonly ILogger<AuthProducer> _logger;
     
     public AuthProducer(IBus bus, ILogger<AuthProducer> logger)
     {

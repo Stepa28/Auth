@@ -1,13 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
-using Auth.BusinessLayer.Configurations;
 using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Security;
 using Marvelous.Contracts.Enums;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,20 +20,22 @@ public class AuthService : IAuthService
     private readonly IMemoryCache _cache;
     private readonly IExceptionsHelper _exceptionsHelper;
     private readonly IInitializeMicroserviceModels _initializeModels;
+    private readonly IConfiguration _config;
 
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IInitializeMicroserviceModels initializeModels)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IInitializeMicroserviceModels initializeModels, IConfiguration config)
     {
         _logger = logger;
         _cache = memoryCache;
         _exceptionsHelper = exceptionsHelper;
         _initializeModels = initializeModels;
+        _config = config;
     }
 
-    public Task<string> GetTokenForFront(string email, string pass, Microservice service)
+    public string GetTokenForFront(string email, string pass, Microservice service)
     {
         if (!_cache.Get<bool>("Initialization"))
         {
-            var ex = new BadRequestException("Microservice initialization was not completed");
+            var ex = new ServiceUnavailableException("Microservice initialization was not completed");
             _logger.LogError(ex, "");
             throw ex;
         }
@@ -50,20 +53,20 @@ public class AuthService : IAuthService
         };
 
         _logger.LogInformation($"Received a token for a lead with email {email.Encryptor()}({service})");
-        return Task.FromResult(FormationToken(service, claims));
+        return GenerateToken(service, claims);
     }
 
-    public Task<string> GetTokenForMicroservice(Microservice service)
+    public string GetTokenForMicroservice(Microservice service)
     {
         _logger.LogInformation($"{service} service requested to receive a token for microservices");
-        return Task.FromResult(FormationToken(service));
+        return GenerateToken(service);
     }
 
-    public Task CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
+    public void CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
     {
         _logger.LogInformation($"Received a request to validate a microservices token from {service}");
         var issuerMicroserviceModel = Microservices.FirstOrDefault(t => t.Key.ToString().Equals(issuerToken)).Value;
-        if (!issuerMicroserviceModel.GetServicesThatHaveAccess().Equals(audienceToken))
+        if (!issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
         {
             var ex = new BadRequestException("Broken token");
             _logger.LogError(ex, "Token contains invalid data");
@@ -73,16 +76,15 @@ public class AuthService : IAuthService
         var audiencesFromToken = Regex.Split(audienceToken, ",");
         if (!audiencesFromToken.Contains(service.ToString()))
         {
-            var ex = new ForbiddenException($"{service} service does not have access");
+            var ex = new ForbiddenException($"You don't have access to {service}");
             _logger.LogError(ex, "Not contain from audiences");
             throw ex;
         }
 
         _logger.LogInformation("Verification token was successful");
-        return Task.CompletedTask;
     }
 
-    public Task CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
+    public void CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
     {
         _logger.LogInformation("Frontend token validation request received");
         if (!issuerToken.Equals(service.ToString()))
@@ -102,22 +104,21 @@ public class AuthService : IAuthService
         }
 
         _logger.LogInformation("Verification token was successful");
-        return Task.CompletedTask;
     }
 
-    public Task<string> GetHashPassword(string password)
+    public string GetHashPassword(string password)
     {
-        return Task.FromResult(PasswordHash.HashPassword(password));
+        return PasswordHash.HashPassword(password);
     }
 
-    private string FormationToken(Microservice issuerService, IEnumerable<Claim>? claims = null)
+    private string GenerateToken(Microservice issuerService, IEnumerable<Claim>? claims = null)
     {
         var jwt = new JwtSecurityToken(
             issuerService.ToString(),
-            Microservices[issuerService].GetServicesThatHaveAccess(),
+            Microservices[issuerService].ServicesThatHaveAccess,
             claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)), //TODO магические числа
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
+            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)),
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["secretKey"])),
                 SecurityAlgorithms.HmacSha256));
 
         return new JwtSecurityTokenHandler().WriteToken(jwt);

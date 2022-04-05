@@ -35,12 +35,12 @@ public class InitializationService : IInitializationService
     public async Task InitializeMemoryCashAsync(Timer timer)
     {
         _cache.Set("Initialization", false);
-        var token = await _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
+        var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
         
         var response = await GetRestResponse(CrmUrls.Url, CrmUrls.LeadApi + CrmUrls.Auth, Microservice.MarvelousCrm, token);
         if (response is null)
         {
-            response = await GetRestResponse(ReportingUrls.Url, ReportingUrls.ApiLeads + ReportingUrls.Auth, Microservice.MarvelousReporting, token);
+            response = await GetRestResponse(ReportingUrls.Url, ReportingUrls.ApiLeads + ReportingUrls.GetAllLeads, Microservice.MarvelousReporting, token);
             if (response is null)
             {
                 var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";

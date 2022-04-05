@@ -4,17 +4,16 @@ namespace Auth.BusinessLayer.Models;
 
 public class MicroserviceModel
 {
-    private readonly Func<string> _servicesThatHaveAccess;
-
-    public MicroserviceModel(string ip, Func<string> servicesThatHaveAccess, Microservice microservice)
+    public MicroserviceModel(string address, string servicesThatHaveAccess, Microservice microservice, Microservice frontend)
     {
-        Ip = ip;
-        _servicesThatHaveAccess = servicesThatHaveAccess;
+        Address = address;
+        ServicesThatHaveAccess = servicesThatHaveAccess;
         Microservice = microservice;
+        Frontend = frontend;
     }
 
-    public string Ip { get; }
+    public string Address { get; }
     public Microservice Microservice { get; }
-    public string GetServicesThatHaveAccess() => _servicesThatHaveAccess();
-    public Frontend Frontend { get; set; }
+    public string ServicesThatHaveAccess { get; }
+    public Microservice Frontend { get; set; }
 }

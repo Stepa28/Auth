@@ -24,21 +24,25 @@ public class ErrorExceptionMiddleware
         {
             await _next(context);
         }
-        catch (ForbiddenException error)
+        catch (ForbiddenException ex)
         {
-            await ConstructResponse(context, HttpStatusCode.Forbidden, error.Message);
+            await ConstructResponse(context, HttpStatusCode.Forbidden, ex.Message);
+        }
+        catch (ServiceUnavailableException ex)
+        {
+            await ConstructResponse(context, HttpStatusCode.ServiceUnavailable, ex.Message);
         }
         catch (AuthenticationException ex)
         {
             await ConstructResponse(context, HttpStatusCode.Unauthorized, ex.Message);
         }
-        catch (NotFoundException error)
+        catch (NotFoundException ex)
         {
-            await ConstructResponse(context, HttpStatusCode.NotFound, error.Message);
+            await ConstructResponse(context, HttpStatusCode.NotFound, ex.Message);
         }
-        catch (BadRequestException error)
+        catch (BadRequestException ex)
         {
-            await ConstructResponse(context, HttpStatusCode.BadRequest, error.Message);
+            await ConstructResponse(context, HttpStatusCode.BadRequest, ex.Message);
         }
         catch (Exception ex)
         {

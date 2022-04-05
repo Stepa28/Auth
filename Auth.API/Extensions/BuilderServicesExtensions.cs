@@ -1,8 +1,9 @@
-﻿using Auth.BusinessLayer.Configurations;
+﻿using System.Text;
 using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
+using Marvelous.Contracts.Enums;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +26,7 @@ public static class BuilderServicesExtensions
         services.AddTransient<IInitializationService, InitializationService>();
     }
 
-    public static void AddCustomAuth(this IServiceCollection services)
+    public static void AddCustomAuth(this IServiceCollection services, string secretKey)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -35,7 +36,7 @@ public static class BuilderServicesExtensions
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateLifetime = true,
-                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
                         ValidateIssuerSigningKey = true
                     };
                 });
@@ -122,5 +123,11 @@ public static class BuilderServicesExtensions
         timer.Elapsed += async (sender, e) => await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationService>().InitializeMemoryCashAsync(timer);
 
         await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationService>().InitializeMemoryCashAsync(timer);
+    }
+
+    public static void InitializationConfiguration(this WebApplication app, string secretKey, string configAddress)
+    {
+        app.Configuration["secretKey"] = secretKey;
+        app.Configuration[Microservice.MarvelousConfigs.ToString()] = configAddress;
     }
 }
