@@ -4,9 +4,9 @@ namespace Auth.BusinessLayer.Models;
 
 public class MicroserviceModel
 {
-    public MicroserviceModel(string address, string servicesThatHaveAccess, Microservice microservice, Microservice frontend)
+    public MicroserviceModel(string? address, string servicesThatHaveAccess, Microservice microservice, Microservice frontend)
     {
-        Address = address;
+        Address = address ?? "";
         ServicesThatHaveAccess = servicesThatHaveAccess;
         Microservice = microservice;
         Frontend = frontend;

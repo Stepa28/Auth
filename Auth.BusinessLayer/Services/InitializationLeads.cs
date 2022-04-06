@@ -12,16 +12,16 @@ using Timer = System.Timers.Timer;
 
 namespace Auth.BusinessLayer.Services;
 
-public class InitializationService : IInitializationService
+public class InitializationLeads : IInitializationLeads
 {
     private readonly IRequestHelper _requestHelper;
-    private readonly ILogger<InitializationService> _logger;
+    private readonly ILogger<InitializationLeads> _logger;
     private readonly IMapper _mapper;
     private readonly IMemoryCache _cache;
     private readonly IAuthProducer _producer;
     private readonly IAuthService _authService;
 
-    public InitializationService(IRequestHelper requestHelper, ILogger<InitializationService> logger, IMapper mapper, IMemoryCache cache, IAuthProducer producer, IAuthService authService)
+    public InitializationLeads(IRequestHelper requestHelper, ILogger<InitializationLeads> logger, IMapper mapper, IMemoryCache cache, IAuthProducer producer, IAuthService authService)
     {
         _requestHelper = requestHelper;
         _logger = logger;

@@ -2,7 +2,7 @@
 
 namespace Auth.BusinessLayer.Services;
 
-public interface IInitializationService
+public interface IInitializationLeads
 {
     Task InitializeMemoryCashAsync(Timer timer);
 }

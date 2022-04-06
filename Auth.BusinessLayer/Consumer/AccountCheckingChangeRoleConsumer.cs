@@ -7,12 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Auth.BusinessLayer.Consumer;
 
-public class AccountCheckingChangeRole : IConsumer<LeadShortExchangeModel[]>
+public class AccountCheckingChangeRoleConsumer : IConsumer<LeadShortExchangeModel[]>
 {
-    private readonly ILogger<AccountCheckingChangeRole> _logger;
+    private readonly ILogger<AccountCheckingChangeRoleConsumer> _logger;
     private readonly IMemoryCache _cache;
 
-    public AccountCheckingChangeRole(ILogger<AccountCheckingChangeRole> logger, IMemoryCache cache)
+    public AccountCheckingChangeRoleConsumer(ILogger<AccountCheckingChangeRoleConsumer> logger, IMemoryCache cache)
     {
         _logger = logger;
         _cache = cache;

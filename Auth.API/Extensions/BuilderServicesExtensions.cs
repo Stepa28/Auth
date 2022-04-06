@@ -6,6 +6,7 @@ using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
@@ -23,7 +24,8 @@ public static class BuilderServicesExtensions
         services.AddScoped<IAuthProducer, AuthProducer>();
         services.AddScoped<IExceptionsHelper, ExceptionsHelper>();
         services.AddScoped<IInitializeMicroserviceModels, InitializeMicroserviceModels>();
-        services.AddTransient<IInitializationService, InitializationService>();
+        services.AddTransient<IInitializationLeads, InitializationLeads>();
+        services.AddTransient<IInitializationConfigs, InitializationConfigs>();
     }
 
     public static void AddCustomAuth(this IServiceCollection services, string secretKey)
@@ -59,14 +61,15 @@ public static class BuilderServicesExtensions
                         Url = new Uri("https://github.com/Stepa28/Auth")
                     }
                 });
-            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "Bearer",
-                BearerFormat = "JWT",
-                Description = "JWT Authorization header using the Bearer scheme."
-            });
+            config.AddSecurityDefinition("Bearer",
+                new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Description = "JWT Authorization header using the Bearer scheme."
+                });
             config.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -100,19 +103,28 @@ public static class BuilderServicesExtensions
         services.AddMassTransit(x =>
         {
             x.AddConsumer<CrmAddOrChangeLeadConsumer>();
-            x.AddConsumer<AccountCheckingChangeRole>();
+            x.AddConsumer<AccountCheckingChangeRoleConsumer>();
+            x.AddConsumer<ConfigChangeConsumer>();
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.ReceiveEndpoint("leadAddOrChangeAuthQueue", e =>
-                {
-                    e.PurgeOnStartup = true;
-                    e.ConfigureConsumer<CrmAddOrChangeLeadConsumer>(context);
-                });
-                cfg.ReceiveEndpoint("leadChangeRoleQueue", e =>
-                {
-                    e.PurgeOnStartup = true;
-                    e.ConfigureConsumer<AccountCheckingChangeRole>(context);
-                });
+                cfg.ReceiveEndpoint("leadAddOrChangeAuthQueue",
+                    e =>
+                    {
+                        e.PurgeOnStartup = true;
+                        e.ConfigureConsumer<CrmAddOrChangeLeadConsumer>(context);
+                    });
+                cfg.ReceiveEndpoint("leadChangeRoleQueue",
+                    e =>
+                    {
+                        e.PurgeOnStartup = true;
+                        e.ConfigureConsumer<AccountCheckingChangeRoleConsumer>(context);
+                    });
+                cfg.ReceiveEndpoint("ChangeConfigAuth",
+                    e =>
+                    {
+                        e.PurgeOnStartup = true;
+                        e.ConfigureConsumer<ConfigChangeConsumer>(context);
+                    });
             });
         });
     }
@@ -120,14 +132,17 @@ public static class BuilderServicesExtensions
     public static async void InitializationLeads(this WebApplication app)
     {
         var timer = new Timer(3600000) { AutoReset = false };
-        timer.Elapsed += async (sender, e) => await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationService>().InitializeMemoryCashAsync(timer);
+        timer.Elapsed += async (sender, e) =>
+            await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationLeads>().InitializeMemoryCashAsync(timer);
 
-        await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationService>().InitializeMemoryCashAsync(timer);
+        await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationLeads>().InitializeMemoryCashAsync(timer);
     }
 
-    public static void InitializationConfiguration(this WebApplication app, string secretKey, string configAddress)
+    public static async void InitializationConfiguration(this WebApplication app, string secretKey, string configAddress)
     {
         app.Configuration["secretKey"] = secretKey;
         app.Configuration[Microservice.MarvelousConfigs.ToString()] = configAddress;
+        await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationConfigs>().InitializeConfigs();
+        app.Services.GetRequiredService<IMemoryCache>().Set(nameof(Microservice), new InitializeMicroserviceModels(app.Configuration).InitializeMicroservices());
     }
 }

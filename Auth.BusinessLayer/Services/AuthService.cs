@@ -33,7 +33,7 @@ public class AuthService : IAuthService
 
     public string GetTokenForFront(string email, string pass, Microservice service)
     {
-        if (!_cache.Get<bool>("Initialization"))
+        if (!_cache.GetOrCreate("Initialization", (ICacheEntry _) => false))
         {
             var ex = new ServiceUnavailableException("Microservice initialization was not completed");
             _logger.LogError(ex, "");

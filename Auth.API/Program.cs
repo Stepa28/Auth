@@ -31,16 +31,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
-//запуск инициализации конфигурации
-app.InitializationConfiguration(secretKey, addressConfig);
-
 //запуск инициализации моделей микросервисов
-app.Services.GetRequiredService<IMemoryCache>().GetOrCreate(nameof(Microservice),
-    (ICacheEntry _) => new InitializeMicroserviceModels(app.Configuration)
-        .InitializeMicroservices());
-
-//запуск инициализации кеша лидов
-app.InitializationLeads();
+app.Services.GetRequiredService<IMemoryCache>().Set(nameof(Microservice), new InitializeMicroserviceModels(app.Configuration).InitializeMicroservices());
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -49,4 +41,11 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
+app.RunAsync();
+
+//запуск инициализации конфигурации
+app.InitializationConfiguration(secretKey, addressConfig);
+
+//запуск инициализации кеша лидов
+app.InitializationLeads();
+Console.ReadKey();
