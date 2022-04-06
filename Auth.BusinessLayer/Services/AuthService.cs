@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -68,7 +69,7 @@ public class AuthService : IAuthService
         var issuerMicroserviceModel = Microservices.FirstOrDefault(t => t.Key.ToString().Equals(issuerToken)).Value;
         if (!issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
         {
-            var ex = new BadRequestException("Broken token");
+            var ex = new AuthenticationException("Broken token");
             _logger.LogError(ex, "Token contains invalid data");
             throw ex;
         }
@@ -89,7 +90,7 @@ public class AuthService : IAuthService
         _logger.LogInformation("Frontend token validation request received");
         if (!issuerToken.Equals(service.ToString()))
         {
-            var ex = new BadRequestException("Broken token");
+            var ex = new AuthenticationException("Broken token");
             _logger.LogError(ex, $"The token was not issued for {service} service");
             throw ex;
         }

@@ -30,6 +30,7 @@ public class AuthorizationsController : AdvancedController
     [HttpPost(AuthUrls.Login)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status404NotFound)]
     [SwaggerOperation("Get a token for font and microservice")]
@@ -45,8 +46,7 @@ public class AuthorizationsController : AdvancedController
     //api/auth/token-microservice
     [HttpGet(AuthUrls.TokenForMicroservice)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [SwaggerOperation("Get a token for microservice")]
     public ActionResult<string> GetTokenForMicroservice()
     {
@@ -60,7 +60,6 @@ public class AuthorizationsController : AdvancedController
     [HttpGet(AuthUrls.ValidationMicroservice)]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate token among microservices")]
@@ -76,7 +75,6 @@ public class AuthorizationsController : AdvancedController
     [HttpGet(AuthUrls.ValidationFront)]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate frontend token")]
@@ -90,7 +88,6 @@ public class AuthorizationsController : AdvancedController
     [HttpPost(AuthUrls.HashPassword)]
     [Authorize]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Hashing password")]
