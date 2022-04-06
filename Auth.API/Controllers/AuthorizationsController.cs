@@ -66,6 +66,8 @@ public class AuthorizationsController : AdvancedController
     [SwaggerOperation("Check validate token among microservices")]
     public ActionResult CheckTokenAmongMicroservices()
     {
+        if(Issuer.Equals(Microservice.MarvelousAuth.ToString()))
+            return Ok();
         _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Service);
         return Ok();
     }

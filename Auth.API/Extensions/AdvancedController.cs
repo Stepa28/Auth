@@ -28,10 +28,11 @@ public class AdvancedController : Controller
 
     private Microservice GetMicroserviceWhoUseEndpointByIp()
     {
+        var address = $"{HttpContext.Connection.RemoteIpAddress!}:{HttpContext.Connection.RemotePort}";
         var tmp = _cache.GetOrCreate(nameof(Microservice),
                             (ICacheEntry _) => _initializeModels.InitializeMicroservices())
                         .Values
-                        .FirstOrDefault(t => t.Address == HttpContext.Connection.RemoteIpAddress!.ToString() + HttpContext.Connection.RemotePort);
+                        .FirstOrDefault(t => t.Address.Equals(address));
 
         if (tmp is not null)
             return tmp.Microservice;
