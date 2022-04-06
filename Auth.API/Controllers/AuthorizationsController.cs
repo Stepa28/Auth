@@ -29,7 +29,6 @@ public class AuthorizationsController : AdvancedController
     //api/auth/login
     [HttpPost(AuthUrls.Login)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status404NotFound)]

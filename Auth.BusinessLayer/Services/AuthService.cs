@@ -53,7 +53,7 @@ public class AuthService : IAuthService
             new(ClaimTypes.Role, entity.Role.ToString())
         };
 
-        _logger.LogInformation($"Received a token for a lead with email {email.Encryptor()}({service})");
+        _logger.LogInformation($"Received a token for a lead with email = {email.Encryptor()}({service})");
         return GenerateToken(service, claims);
     }
 

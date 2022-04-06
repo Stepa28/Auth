@@ -29,7 +29,12 @@ builder.Services.AddMassTransit();
 builder.Services.AddCustomAuth(secretKey);
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.AddHostedService<HostedService>();
+
 var app = builder.Build();
+
+app.Configuration["secretKey"] = secretKey;
+app.Configuration[Microservice.MarvelousConfigs.ToString()] = addressConfig;
 
 //запуск инициализации моделей микросервисов
 app.Services.GetRequiredService<IMemoryCache>().Set(nameof(Microservice), new InitializeMicroserviceModels(app.Configuration).InitializeMicroservices());
@@ -41,11 +46,4 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.RunAsync();
-
-//запуск инициализации конфигурации
-app.InitializationConfiguration(secretKey, addressConfig);
-
-//запуск инициализации кеша лидов
-app.InitializationLeads();
-Console.ReadKey();
+app.Run();

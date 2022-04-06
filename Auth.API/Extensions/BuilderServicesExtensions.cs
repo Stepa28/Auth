@@ -3,14 +3,11 @@ using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
-using Marvelous.Contracts.Enums;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
-using Timer = System.Timers.Timer;
 
 namespace Auth.API.Extensions;
 
@@ -18,12 +15,12 @@ public static class BuilderServicesExtensions
 {
     public static void RegisterServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddSingleton<IAuthService, AuthService>();
 
-        services.AddScoped<IRequestHelper, RequestHelper>();
-        services.AddScoped<IAuthProducer, AuthProducer>();
-        services.AddScoped<IExceptionsHelper, ExceptionsHelper>();
-        services.AddScoped<IInitializeMicroserviceModels, InitializeMicroserviceModels>();
+        services.AddSingleton<IRequestHelper, RequestHelper>();
+        services.AddSingleton<IAuthProducer, AuthProducer>();
+        services.AddSingleton<IExceptionsHelper, ExceptionsHelper>();
+        services.AddSingleton<IInitializeMicroserviceModels, InitializeMicroserviceModels>();
         services.AddTransient<IInitializationLeads, InitializationLeads>();
         services.AddTransient<IInitializationConfigs, InitializationConfigs>();
     }
@@ -127,22 +124,5 @@ public static class BuilderServicesExtensions
                     });
             });
         });
-    }
-
-    public static async void InitializationLeads(this WebApplication app)
-    {
-        var timer = new Timer(3600000) { AutoReset = false };
-        timer.Elapsed += async (sender, e) =>
-            await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationLeads>().InitializeMemoryCashAsync(timer);
-
-        await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationLeads>().InitializeMemoryCashAsync(timer);
-    }
-
-    public static async void InitializationConfiguration(this WebApplication app, string secretKey, string configAddress)
-    {
-        app.Configuration["secretKey"] = secretKey;
-        app.Configuration[Microservice.MarvelousConfigs.ToString()] = configAddress;
-        await app.Services.CreateScope().ServiceProvider.GetRequiredService<IInitializationConfigs>().InitializeConfigs();
-        app.Services.GetRequiredService<IMemoryCache>().Set(nameof(Microservice), new InitializeMicroserviceModels(app.Configuration).InitializeMicroservices());
     }
 }

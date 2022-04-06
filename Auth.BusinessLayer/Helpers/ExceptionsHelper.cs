@@ -8,7 +8,7 @@ namespace Auth.BusinessLayer.Helpers;
 
 public class ExceptionsHelper : IExceptionsHelper
 {
-    private const string NotFound = "Entity with e-mail = {0} not foun";
+    private const string NotFound = "Entity with e-mail = {0} not found";
     private const string PasswordIsIncorrected = "Incorrected password";
     private readonly ILogger<ExceptionsHelper> _logger;
 
@@ -22,8 +22,9 @@ public class ExceptionsHelper : IExceptionsHelper
         if (!IsNullOrEmpty(lead.HashPassword) || lead.Id != default || lead.Role != default)
             return;
 
-        _logger.LogError(Format(NotFound, email));
-        throw new NotFoundException(Format(NotFound, email));
+        var ex = new NotFoundException(Format(NotFound, email));
+        _logger.LogError(ex, "");
+        throw ex;
     }
 
     public void ThrowIfPasswordIsIncorrected(string pass, string hashPassFromBd)
@@ -31,7 +32,8 @@ public class ExceptionsHelper : IExceptionsHelper
         if (PasswordHash.ValidatePassword(pass, hashPassFromBd))
             return;
 
-        _logger.LogError(PasswordIsIncorrected);
-        throw new IncorrectPasswordException(PasswordIsIncorrected);
+        var ex = new IncorrectPasswordException(PasswordIsIncorrected);
+        _logger.LogError(ex, "");
+        throw ex;
     }
 }

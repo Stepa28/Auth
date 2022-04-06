@@ -7,8 +7,8 @@ using Marvelous.Contracts.ExchangeModels;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Marvelous.Contracts.Urls;
+using Microsoft.Extensions.Configuration;
 using RestSharp;
-using Timer = System.Timers.Timer;
 
 namespace Auth.BusinessLayer.Services;
 
@@ -20,8 +20,9 @@ public class InitializationLeads : IInitializationLeads
     private readonly IMemoryCache _cache;
     private readonly IAuthProducer _producer;
     private readonly IAuthService _authService;
+    private readonly IConfiguration _config;
 
-    public InitializationLeads(IRequestHelper requestHelper, ILogger<InitializationLeads> logger, IMapper mapper, IMemoryCache cache, IAuthProducer producer, IAuthService authService)
+    public InitializationLeads(IRequestHelper requestHelper, ILogger<InitializationLeads> logger, IMapper mapper, IMemoryCache cache, IAuthProducer producer, IAuthService authService, IConfiguration config)
     {
         _requestHelper = requestHelper;
         _logger = logger;
@@ -29,23 +30,23 @@ public class InitializationLeads : IInitializationLeads
         _cache = cache;
         _producer = producer;
         _authService = authService;
+        _config = config;
     }
 
-    public async Task InitializeMemoryCashAsync(Timer timer)
+    public async Task InitializeLeadsAsync()
     {
         _cache.Set("Initialization", false);
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
         
-        var response = await GetRestResponse(CrmUrls.Url, CrmUrls.LeadApi + CrmUrls.Auth, Microservice.MarvelousCrm, token);
+        var response = await GetRestResponse(CrmUrls.LeadApi + CrmUrls.Auth, Microservice.MarvelousCrm, token);
         if (response is null)
         {
-            response = await GetRestResponse(ReportingUrls.Url, ReportingUrls.ApiLeads + ReportingUrls.GetAllLeads, Microservice.MarvelousReporting, token);
+            response = await GetRestResponse(ReportingUrls.ApiLeads + ReportingUrls.GetAllLeads, Microservice.MarvelousReporting, token);
             if (response is null)
             {
                 var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
                 _logger.LogCritical(message);
                 await _producer.NotifyFatalError(message);
-                timer.Start();
                 return;
             }
             _logger.LogInformation("Initialization from service Reporting: completed successfully");
@@ -62,13 +63,13 @@ public class InitializationLeads : IInitializationLeads
         _cache.Set("Initialization", true);
     }
 
-    private async Task<RestResponse<IEnumerable<LeadAuthExchangeModel>>?> GetRestResponse(string url, string path, Microservice service, string token)
+    private async Task<RestResponse<IEnumerable<LeadAuthExchangeModel>>?> GetRestResponse(string path, Microservice service, string token)
     {
         _logger.LogInformation($"Attempt to initialize from {service} service");
         RestResponse<IEnumerable<LeadAuthExchangeModel>>? response = null;
         try
         {
-            response = await _requestHelper.SendRequestAsync<IEnumerable<LeadAuthExchangeModel>>(url, path, Method.Get, service, token);
+            response = await _requestHelper.SendRequestAsync<IEnumerable<LeadAuthExchangeModel>>($"https://{_config[service.ToString()]}", path, Method.Get, service, token);
         }
         catch (Exception ex)
         {
