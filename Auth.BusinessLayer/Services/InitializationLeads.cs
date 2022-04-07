@@ -69,7 +69,7 @@ public class InitializationLeads : IInitializationLeads
         RestResponse<IEnumerable<LeadAuthExchangeModel>>? response = null;
         try
         {
-            response = await _requestHelper.SendRequestAsync<IEnumerable<LeadAuthExchangeModel>>($"https://{_config[service.ToString()]}", path, Method.Get, service, token);
+            response = await _requestHelper.SendRequestAsync<IEnumerable<LeadAuthExchangeModel>>(_config[$"{service}Url"], path, Method.Get, service, token);
         }
         catch (Exception ex)
         {

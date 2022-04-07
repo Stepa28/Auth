@@ -24,17 +24,13 @@ public class ErrorExceptionMiddleware
         {
             await _next(context);
         }
-        catch (ForbiddenException ex)
-        {
-            await ConstructResponse(context, HttpStatusCode.Forbidden, ex.Message);
-        }
-        catch (ServiceUnavailableException ex)
-        {
-            await ConstructResponse(context, HttpStatusCode.ServiceUnavailable, ex.Message);
-        }
         catch (AuthenticationException ex)
         {
             await ConstructResponse(context, HttpStatusCode.Unauthorized, ex.Message);
+        }
+        catch (ForbiddenException ex)
+        {
+            await ConstructResponse(context, HttpStatusCode.Forbidden, ex.Message);
         }
         catch (NotFoundException ex)
         {
@@ -44,6 +40,10 @@ public class ErrorExceptionMiddleware
         {
             await ConstructResponse(context, HttpStatusCode.BadRequest, ex.Message);
         }
+        catch (ServiceUnavailableException ex)
+        {
+            await ConstructResponse(context, HttpStatusCode.ServiceUnavailable, ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.Error(ex);
@@ -51,7 +51,7 @@ public class ErrorExceptionMiddleware
         }
     }
 
-    private async Task ConstructResponse(HttpContext context, HttpStatusCode code, string message)
+    private static async Task ConstructResponse(HttpContext context, HttpStatusCode code, string message)
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)code;

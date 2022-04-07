@@ -29,15 +29,17 @@ public class HostedService : BackgroundService
         // Приложение запущено и готово к обработке запросов
 
         //запуск инициализации конфигурации
-        await _configs.InitializeConfigs();
+        _configs.InitializeConfigs();
         _cache.Set(nameof(Microservice), _microservice.InitializeMicroservices());
 
         //запуск инициализации кеша лидов(если не удалось повторить через час)
         do
         {
             await _leads.InitializeLeadsAsync();
+            if (_cache.Get<bool>("Initialization"))
+                return;
             await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
-        } while (!_cache.Get<bool>("Initialization"));
+        } while (true);
     }
 
     private static async Task<bool> WaitForAppStartup(IHostApplicationLifetime lifetime, CancellationToken stoppingToken)

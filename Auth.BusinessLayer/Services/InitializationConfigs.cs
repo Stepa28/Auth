@@ -22,7 +22,7 @@ public class InitializationConfigs : IInitializationConfigs
         _authService = authService;
     }
 
-    public async Task InitializeConfigs()
+    public void InitializeConfigs()
     {
         _logger.LogInformation($"Attempt to initialize configs from {Microservice.MarvelousConfigs} service");
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
@@ -30,17 +30,17 @@ public class InitializationConfigs : IInitializationConfigs
         RestResponse<IEnumerable<ConfigExchangeModel>> response;
         try
         {
-            response = await _requestHelper.SendRequestAsync<IEnumerable<ConfigExchangeModel>>($"https://{_config[Microservice.MarvelousConfigs.ToString()]}",
+            response = _requestHelper.SendRequestAsync<IEnumerable<ConfigExchangeModel>>(_config[$"{Microservice.MarvelousConfigs}Url"],
                 "/api/microservices",
                 Method.Get,
                 Microservice.MarvelousConfigs,
-                token);
+                token).Result;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Failed to initialize configs from {Microservice.MarvelousConfigs} service");
             _logger.LogInformation("Start initialize default config");
-            for (var i = Microservice.MarvelousAccountChecking; i < Microservice.Undefined; i++)
+            for (var i = Microservice.MarvelousAccountChecking; i <= Microservice.MarvelousSmsSendler; i++)
             {
                 _config[i.ToString()] = "::1";
             }

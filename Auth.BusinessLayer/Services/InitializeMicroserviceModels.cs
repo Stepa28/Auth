@@ -24,15 +24,15 @@ public class InitializeMicroserviceModels : IInitializeMicroserviceModels
 
         microservices.Add(Microservice.MarvelousResource,
             new MicroserviceModel(_config[Microservice.MarvelousResource.ToString()],
-                StringJoinMicroservices(Microservice.MarvelousTransactionStore, Microservice.MarvelousCrm, Microservice.MarvelousFrontendService),
+                StringJoinMicroservices(Microservice.MarvelousTransactionStore, Microservice.MarvelousCrm, Microservice.MarvelousFrontendResource),
                 Microservice.MarvelousResource,
-                Microservice.MarvelousFrontendService));
+                Microservice.MarvelousFrontendResource));
 
         microservices.Add(Microservice.MarvelousTransactionStore,
             new MicroserviceModel(_config[Microservice.MarvelousTransactionStore.ToString()],
                 Microservice.MarvelousCrm.ToString(),
                 Microservice.MarvelousTransactionStore,
-                Microservice.Undefined));
+                Microservice.MarvelousFrontendUndefined));
 
         microservices.Add(Microservice.MarvelousCrm,
             new MicroserviceModel(_config[Microservice.MarvelousCrm.ToString()],
@@ -50,7 +50,7 @@ public class InitializeMicroserviceModels : IInitializeMicroserviceModels
             new MicroserviceModel(_config[Microservice.MarvelousAuth.ToString()],
                 StringJoinMicroservices(Microservice.MarvelousCrm, Microservice.MarvelousReporting),
                 Microservice.MarvelousAuth,
-                Microservice.Undefined));
+                Microservice.MarvelousFrontendUndefined));
 
         return microservices;
     }
@@ -60,7 +60,7 @@ public class InitializeMicroserviceModels : IInitializeMicroserviceModels
         foreach (var service in services)
         {
             microservices.Add(service,
-                new MicroserviceModel(_config[service.ToString()], Microservice.MarvelousConfigs.ToString(), service, Microservice.Undefined));
+                new MicroserviceModel(_config[service.ToString()], Microservice.MarvelousConfigs.ToString(), service, Microservice.MarvelousFrontendUndefined));
         }
     }
 

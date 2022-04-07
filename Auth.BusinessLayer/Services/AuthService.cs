@@ -23,7 +23,8 @@ public class AuthService : IAuthService
     private readonly IInitializeMicroserviceModels _initializeModels;
     private readonly IConfiguration _config;
 
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IInitializeMicroserviceModels initializeModels, IConfiguration config)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IInitializeMicroserviceModels initializeModels,
+        IConfiguration config)
     {
         _logger = logger;
         _cache = memoryCache;
@@ -34,9 +35,9 @@ public class AuthService : IAuthService
 
     public string GetTokenForFront(string email, string pass, Microservice service)
     {
-        if (!_cache.GetOrCreate("Initialization", (ICacheEntry _) => false))
+        if (!_cache.Get<bool>("Initialization"))
         {
-            var ex = new ServiceUnavailableException("Microservice initialization was not completed");
+            var ex = new ServiceUnavailableException("Microservice initialize leads was not completed");
             _logger.LogError(ex, "");
             throw ex;
         }
@@ -63,7 +64,7 @@ public class AuthService : IAuthService
         return GenerateToken(service);
     }
 
-    public void CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
+    public bool CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
     {
         _logger.LogInformation($"Received a request to validate a microservices token from {service}");
         var issuerMicroserviceModel = Microservices.FirstOrDefault(t => t.Key.ToString().Equals(issuerToken)).Value;
@@ -83,11 +84,12 @@ public class AuthService : IAuthService
         }
 
         _logger.LogInformation("Verification token was successful");
+        return true;
     }
 
-    public void CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
+    public bool CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
     {
-        _logger.LogInformation("Frontend token validation request received");
+        _logger.LogInformation($"Frontend token validation request received({service})");
         if (!issuerToken.Equals(service.ToString()))
         {
             var ex = new AuthenticationException("Broken token");
@@ -105,6 +107,7 @@ public class AuthService : IAuthService
         }
 
         _logger.LogInformation("Verification token was successful");
+        return true;
     }
 
     public string GetHashPassword(string password)
