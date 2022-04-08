@@ -2,12 +2,11 @@ using Auth.API.Extensions;
 using Auth.API.Infrastructure;
 using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
-using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 const string _logDirectoryVariableName = "LOG_DIRECTORY";
 const string _secretKeyVariableName = "SUPER_SECRET_KYE";
-const string _configUrlVariableName = "ADDRESS_AUTH";
+const string _configUrlVariableName = "ADDRESS_CONFIGS";
 var logDirectory = builder.Configuration.GetValue<string>(_logDirectoryVariableName);
 var secretKey = builder.Configuration.GetValue<string>(_secretKeyVariableName);
 var configUrl = builder.Configuration.GetValue<string>(_configUrlVariableName);
@@ -35,9 +34,6 @@ var app = builder.Build();
 
 app.Configuration["secretKey"] = secretKey;
 app.Configuration[$"{Microservice.MarvelousConfigs}Url"] = configUrl;
-
-//запуск инициализации моделей микросервисов
-app.Services.GetRequiredService<IMemoryCache>().Set(nameof(Microservice), new InitializeMicroserviceModels(app.Configuration).InitializeMicroservices());
 
 app.UseSwagger();
 app.UseSwaggerUI();

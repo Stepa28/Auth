@@ -25,7 +25,6 @@ public class AuthServiceTests
     private Mock<ILogger<AuthService>> _logger;
     private IMemoryCache _cache;
     private Mock<IExceptionsHelper> _exceptionsHelper;
-    private Mock<IInitializeMicroserviceModels> _initializeMicroservice;
     private Mock<IConfiguration> _config;
     private IAuthService _authService;
 
@@ -38,14 +37,13 @@ public class AuthServiceTests
         _logger = new Mock<ILogger<AuthService>>();
         _cache = new MemoryCache(new MemoryCacheOptions());
         _exceptionsHelper = new Mock<IExceptionsHelper>();
-        _initializeMicroservice = new Mock<IInitializeMicroserviceModels>();
         _config = new Mock<IConfiguration>();
 
         _config.Setup(s => s["secretKey"]).Returns(_secretKey);
-        _microservices = new InitializeMicroserviceModels(_config.Object).InitializeMicroservices();
+        _microservices = InitializeMicroserviceModels.InitializeMicroservices();
         _cache.Set(nameof(Microservice), _microservices);
 
-        _authService = new AuthService(_logger.Object, _cache, _exceptionsHelper.Object, _initializeMicroservice.Object, _config.Object);
+        _authService = new AuthService(_logger.Object, _cache, _exceptionsHelper.Object, _config.Object);
     }
 
     [TestCaseSource(typeof(AuthServiceTestCaseData), nameof(AuthServiceTestCaseData.GetTestCaseDataForGetTokenForFrontTest))]
@@ -113,40 +111,40 @@ public class AuthServiceTests
     {
         //given
         var expected = GenerateToken(service);
-        
+
         //when
         var actual = _authService.GetTokenForMicroservice(service);
-        
+
         //then
         Assert.AreEqual(expected, actual);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousAuth)]
     [TestCase(Microservice.MarvelousResource, Microservice.MarvelousCrm)]
-    [TestCase(Microservice.MarvelousTransactionStore, Microservice.MarvelousCrm)]
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousTransactionStore)]
     public void CheckValidTokenAmongMicroservicesTest(Microservice issuerToken, Microservice service)
     {
         //when
         var actual = _authService.CheckValidTokenAmongMicroservices(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service);
-        
+
         //then
         Assert.IsTrue(actual);
     }
-    
+
     [Test]
     public void CheckValidTokenAmongMicroservicesNegativeTest_AuthenticationException()
     {
         //given
         var expected = "Broken token";
-        
+
         //when
-        var actual = Assert.Throws<AuthenticationException>(() => _authService.CheckValidTokenAmongMicroservices(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
-        
+        var actual = Assert.Throws<AuthenticationException>(() =>
+            _authService.CheckValidTokenAmongMicroservices(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
+
         //then
         Assert.AreEqual(expected, actual);
     }
-    
+
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
     [TestCase(Microservice.MarvelousTransactionStore, Microservice.MarvelousReporting)]
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
@@ -154,10 +152,11 @@ public class AuthServiceTests
     {
         //given
         var expected = $"You don't have access to {service}";
-        
+
         //when
-        var actual = Assert.Throws<ForbiddenException>(() => _authService.CheckValidTokenAmongMicroservices(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service))!.Message;
-        
+        var actual = Assert.Throws<ForbiddenException>(() =>
+            _authService.CheckValidTokenAmongMicroservices(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service))!.Message;
+
         //then
         Assert.AreEqual(expected, actual);
     }
@@ -169,37 +168,40 @@ public class AuthServiceTests
     {
         //when
         var actual = _authService.CheckValidTokenFrontend(service.ToString(), _microservices[service].ServicesThatHaveAccess, service);
-        
+
         //then
         Assert.IsTrue(actual);
     }
-    
+
     [Test]
     public void CheckValidTokenFrontendNegativeTest_AuthenticationException()
     {
         //given
         var expected = "Broken token";
-        
+
         //when
-        var actual = Assert.Throws<AuthenticationException>(() => _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
-        
+        var actual = Assert.Throws<AuthenticationException>(() =>
+            _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
+
         //then
         Assert.AreEqual(expected, actual);
     }
-    
+
     [Test]
     public void CheckValidTokenFrontendNegativeTest_ForbiddenException()
     {
         //given
         var expected = $"{Microservice.MarvelousFrontendCrm} does not have access";
-        
+
         //when
-        var actual = Assert.Throws<ForbiddenException>(() => _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(), _microservices[Microservice.MarvelousReporting].ServicesThatHaveAccess, Microservice.MarvelousCrm))!.Message;
-        
+        var actual = Assert.Throws<ForbiddenException>(() => _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(),
+            _microservices[Microservice.MarvelousReporting].ServicesThatHaveAccess,
+            Microservice.MarvelousCrm))!.Message;
+
         //then
         Assert.AreEqual(expected, actual);
     }
-    
+
     private string GenerateToken(Microservice issuerService, IEnumerable<Claim>? claims = null)
     {
         var jwt = new JwtSecurityToken(

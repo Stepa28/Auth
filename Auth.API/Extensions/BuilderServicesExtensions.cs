@@ -20,7 +20,6 @@ public static class BuilderServicesExtensions
         services.AddSingleton<IRequestHelper, RequestHelper>();
         services.AddSingleton<IAuthProducer, AuthProducer>();
         services.AddSingleton<IExceptionsHelper, ExceptionsHelper>();
-        services.AddSingleton<IInitializeMicroserviceModels, InitializeMicroserviceModels>();
         services.AddTransient<IInitializationLeads, InitializationLeads>();
         services.AddTransient<IInitializationConfigs, InitializationConfigs>();
     }

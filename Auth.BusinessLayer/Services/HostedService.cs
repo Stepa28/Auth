@@ -1,4 +1,5 @@
-﻿using Marvelous.Contracts.Enums;
+﻿using Auth.BusinessLayer.Helpers;
+using Marvelous.Contracts.Enums;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 
@@ -8,18 +9,15 @@ public class HostedService : BackgroundService
 {
     private readonly IInitializationConfigs _configs;
     private readonly IInitializationLeads _leads;
-    private readonly IInitializeMicroserviceModels _microservice;
     private readonly IMemoryCache _cache;
     private readonly IHostApplicationLifetime _lifetime;
 
-    public HostedService(IHostApplicationLifetime lifetime, IInitializationConfigs configs, IInitializationLeads leads, IMemoryCache cache,
-        IInitializeMicroserviceModels microservice)
+    public HostedService(IHostApplicationLifetime lifetime, IInitializationConfigs configs, IInitializationLeads leads, IMemoryCache cache)
     {
         _lifetime = lifetime;
         _configs = configs;
         _leads = leads;
         _cache = cache;
-        _microservice = microservice;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,9 +26,12 @@ public class HostedService : BackgroundService
             return;
         // Приложение запущено и готово к обработке запросов
 
+        //запуск инициализации моделей микросервисов
+        _cache.Set(nameof(Microservice), InitializeMicroserviceModels.InitializeMicroservices());
+        
         //запуск инициализации конфигурации
         _configs.InitializeConfigs();
-        _cache.Set(nameof(Microservice), _microservice.InitializeMicroservices());
+        _cache.Set(nameof(Microservice), InitializeMicroserviceModels.InitializeMicroservices());
 
         //запуск инициализации кеша лидов(если не удалось повторить через час)
         do

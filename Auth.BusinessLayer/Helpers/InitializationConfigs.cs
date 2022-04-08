@@ -1,11 +1,11 @@
-﻿using Auth.BusinessLayer.Helpers;
+﻿using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ExchangeModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 
-namespace Auth.BusinessLayer.Services;
+namespace Auth.BusinessLayer.Helpers;
 
 public class InitializationConfigs : IInitializationConfigs
 {
@@ -31,7 +31,7 @@ public class InitializationConfigs : IInitializationConfigs
         try
         {
             response = _requestHelper.SendRequestAsync<IEnumerable<ConfigExchangeModel>>(_config[$"{Microservice.MarvelousConfigs}Url"],
-                "/api/configs/by-serviceAddress",
+                $"/api/configs/service/{Microservice.MarvelousAuth}",
                 Method.Get,
                 Microservice.MarvelousConfigs,
                 token).Result;
@@ -40,10 +40,7 @@ public class InitializationConfigs : IInitializationConfigs
         {
             _logger.LogWarning(ex, $"Failed to initialize configs from {Microservice.MarvelousConfigs} service({ex.Message})");
             _logger.LogInformation("Start initialize default config");
-            for (var i = Microservice.MarvelousAccountChecking; i <= Microservice.MarvelousSmsSendler; i++)
-            {
-                _config[i.ToString()] = "::1";
-            }
+            _config["BaseAddress"] = "80.78.240.16";
             _config[$"{Microservice.MarvelousCrm}Url"] = "https://piter-education.ru:5050";
             _config[$"{Microservice.MarvelousReporting}Url"] = "https://piter-education.ru:6010";
             return;

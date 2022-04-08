@@ -19,8 +19,8 @@ public class AuthorizationsController : AdvancedController
     private readonly IAuthService _authService;
     private readonly ILogger<AuthorizationsController> _logger;
 
-    public AuthorizationsController(IAuthService authService, ILogger<AuthorizationsController> logger,
-        IMemoryCache cache, IInitializeMicroserviceModels model) : base(logger, cache, model)
+    public AuthorizationsController(IAuthService authService, ILogger<AuthorizationsController> logger, IMemoryCache cache, IConfiguration config)
+        : base(logger, cache, config)
     {
         _authService = authService;
         _logger = logger;
@@ -64,8 +64,6 @@ public class AuthorizationsController : AdvancedController
     [SwaggerOperation("Check validate token among microservices")]
     public ActionResult CheckTokenAmongMicroservices()
     {
-        if(Issuer.Equals(Microservice.MarvelousAuth.ToString()))
-            return Ok();
         _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Service);
         return Ok();
     }

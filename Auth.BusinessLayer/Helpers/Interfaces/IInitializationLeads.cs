@@ -1,4 +1,4 @@
-﻿namespace Auth.BusinessLayer.Services;
+﻿namespace Auth.BusinessLayer.Helpers;
 
 public interface IInitializationLeads
 {

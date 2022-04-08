@@ -20,16 +20,13 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
     private readonly IExceptionsHelper _exceptionsHelper;
-    private readonly IInitializeMicroserviceModels _initializeModels;
     private readonly IConfiguration _config;
 
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IInitializeMicroserviceModels initializeModels,
-        IConfiguration config)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IConfiguration config)
     {
         _logger = logger;
         _cache = memoryCache;
         _exceptionsHelper = exceptionsHelper;
-        _initializeModels = initializeModels;
         _config = config;
     }
 
@@ -129,5 +126,5 @@ public class AuthService : IAuthService
     }
 
     private Dictionary<Microservice, MicroserviceModel> Microservices =>
-        _cache.GetOrCreate(nameof(Microservice), (ICacheEntry _) => _initializeModels.InitializeMicroservices());
+        _cache.GetOrCreate(nameof(Microservice), (ICacheEntry _) => InitializeMicroserviceModels.InitializeMicroservices());
 }

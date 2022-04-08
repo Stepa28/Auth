@@ -1,16 +1,16 @@
-﻿using Auth.BusinessLayer.Helpers;
-using Auth.BusinessLayer.Models;
+﻿using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Producers;
+using Auth.BusinessLayer.Services;
 using AutoMapper;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ExchangeModels;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Marvelous.Contracts.Urls;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using RestSharp;
 
-namespace Auth.BusinessLayer.Services;
+namespace Auth.BusinessLayer.Helpers;
 
 public class InitializationLeads : IInitializationLeads
 {

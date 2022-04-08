@@ -2,6 +2,7 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using System.Security.Principal;
 using Auth.BusinessLayer.Exceptions;
+using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,29 +18,43 @@ public class AdvancedController : Controller
 
     private readonly ILogger _logger;
     private readonly IMemoryCache _cache;
-    private readonly IInitializeMicroserviceModels _initializeModels;
+    private readonly IConfiguration _config;
 
-    public AdvancedController(ILogger logger, IMemoryCache cache, IInitializeMicroserviceModels initializeModels)
+    public AdvancedController(ILogger logger, IMemoryCache cache, IConfiguration config)
     {
         _logger = logger;
         _cache = cache;
-        _initializeModels = initializeModels;
+        _config = config;
     }
 
     private Microservice GetMicroserviceWhoUseEndpointByIp()
     {
-        var address = $"{HttpContext.Connection.RemoteIpAddress!}:{HttpContext.Connection.RemotePort}";
+        if (!_config["BaseAddress"].Equals(HttpContext.Connection.RemoteIpAddress!.ToString()))
+        {
+            var ex = new ForbiddenException("Your ip is not registered");
+            _logger.LogError(ex, ex.Message);
+            throw ex;
+        }
+
+        if (HttpContext.Request.Headers[nameof(Microservice)].Count != 1)
+        {
+            var ex = new ForbiddenException("Failed to identify service");
+            _logger.LogError(ex, ex.Message);
+            throw ex;
+        }
+
         var tmp = _cache.GetOrCreate(nameof(Microservice),
-                            (ICacheEntry _) => _initializeModels.InitializeMicroservices())
-                        .Values
-                        .FirstOrDefault(t => t.Address.Equals(address));
+                            (ICacheEntry _) => InitializeMicroserviceModels.InitializeMicroservices())
+                        .FirstOrDefault(t => t.Key.ToString().Equals(HttpContext.Request.Headers[nameof(Microservice)][0])).Value;
 
-        if (tmp is not null)
-            return tmp.Microservice;
+        if (tmp is null)
+        {
+            var ex = new ForbiddenException("Failed to identify service");
+            _logger.LogError(ex, ex.Message);
+            throw ex;
+        }
 
-        var ex = new ForbiddenException("Your ip is not registered");
-        _logger.LogError(ex, ex.Message);
-        throw ex;
+        return tmp.Microservice;
     }
 
     private string GetAudienceFromToken()
