@@ -35,7 +35,7 @@ public class InitializationLeads : IInitializationLeads
 
     public async Task InitializeLeadsAsync()
     {
-        _cache.Set("Initialization", false);
+        _cache.Set("Initialization leads", false);
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
         
         var response = await GetRestResponse(CrmUrls.LeadApi + CrmUrls.Auth, Microservice.MarvelousCrm, token);
@@ -46,7 +46,7 @@ public class InitializationLeads : IInitializationLeads
             {
                 var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
                 _logger.LogWarning(message);
-                await _producer.NotifyFatalError(message);
+                await _producer.NotifyErrorByEmail(message);
                 return;
             }
             _logger.LogInformation("Initialization from service Reporting: completed successfully");
@@ -60,7 +60,7 @@ public class InitializationLeads : IInitializationLeads
         {
             _cache.Set(entity.Email, _mapper.Map<LeadAuthModel>(entity));
         }
-        _cache.Set("Initialization", true);
+        _cache.Set("Initialization leads", true);
     }
 
     private async Task<RestResponse<IEnumerable<LeadAuthExchangeModel>>?> GetRestResponse(string path, Microservice service, string token)

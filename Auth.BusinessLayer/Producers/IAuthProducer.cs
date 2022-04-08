@@ -2,5 +2,5 @@
 
 public interface IAuthProducer
 {
-    Task NotifyFatalError(string message);
+    Task NotifyErrorByEmail(string message);
 }

@@ -12,16 +12,12 @@ public class RequestHelper : IRequestHelper
     public async Task<RestResponse<T>> SendRequestAsync<T>(string url, string path, Method method, Microservice service, string jwtToken)
     {
         var request = new RestRequest(path, method);
-        return await GenerateRequest<T>(request, url, service, jwtToken);
-    }
-
-    private static async Task<RestResponse<T>> GenerateRequest<T>(RestRequest request, string url, Microservice service, string jwtToken)
-    {
         var client = new RestClient(new RestClientOptions(url)
         {
             Timeout = 300000
         });
         client.Authenticator = new JwtAuthenticator(jwtToken);
+        client.AddDefaultHeader(nameof(Microservice), Microservice.MarvelousAuth.ToString());
         var response = await client.ExecuteAsync<T>(request);
         CheckTransactionError(response, service);
         return response;

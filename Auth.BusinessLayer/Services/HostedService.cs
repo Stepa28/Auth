@@ -31,13 +31,12 @@ public class HostedService : BackgroundService
         
         //запуск инициализации конфигурации
         _configs.InitializeConfigs();
-        _cache.Set(nameof(Microservice), InitializeMicroserviceModels.InitializeMicroservices());
 
         //запуск инициализации кеша лидов(если не удалось повторить через час)
         do
         {
             await _leads.InitializeLeadsAsync();
-            if (_cache.Get<bool>("Initialization"))
+            if (_cache.Get<bool>("Initialization leads"))
                 return;
             await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
         } while (true);

@@ -16,7 +16,7 @@ public class AuthProducer : IAuthProducer
         _logger = logger;
     }
 
-    public async Task NotifyFatalError(string message)
+    public async Task NotifyErrorByEmail(string message)
     {
         var source = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 

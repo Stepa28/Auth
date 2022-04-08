@@ -50,7 +50,7 @@ public class AuthServiceTests
     public void GetTokenForFrontTest(string email, Microservice service, LeadAuthModel entity, Claim[] claims)
     {
         //given
-        _cache.Set("Initialization", true);
+        _cache.Set("Initialization leads", true);
         _cache.Set(email, entity);
         var expected = GenerateToken(service, claims);
 
@@ -79,7 +79,7 @@ public class AuthServiceTests
     {
         //given
         var expected = "Test exception";
-        _cache.Set("Initialization", true);
+        _cache.Set("Initialization leads", true);
         _exceptionsHelper.Setup(s => s.ThrowIfEmailNotFound(IsAny<string>(), IsAny<LeadAuthModel>())).Throws(new NotFoundException(expected));
 
         //when
@@ -94,7 +94,7 @@ public class AuthServiceTests
     {
         //given
         var expected = "Test exception";
-        _cache.Set("Initialization", true);
+        _cache.Set("Initialization leads", true);
         _exceptionsHelper.Setup(s => s.ThrowIfPasswordIsIncorrected(IsAny<string>(), IsAny<string>())).Throws(new IncorrectPasswordException(expected));
 
         //when

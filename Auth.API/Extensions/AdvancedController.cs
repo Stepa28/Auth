@@ -36,7 +36,7 @@ public class AdvancedController : Controller
             throw ex;
         }
 
-        if (HttpContext.Request.Headers[nameof(Microservice)].Count != 1)
+        if (HttpContext.Request.Headers[nameof(Microservice)].Count == 0)
         {
             var ex = new ForbiddenException("Failed to identify service");
             _logger.LogError(ex, ex.Message);
