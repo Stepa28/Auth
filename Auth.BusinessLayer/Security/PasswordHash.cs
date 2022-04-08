@@ -13,9 +13,8 @@ public class PasswordHash
 
     public static string HashPassword(string password)
     {
-        var cryptoProvider = new RNGCryptoServiceProvider();
         var salt = new byte[SaltByteSize];
-        cryptoProvider.GetBytes(salt);
+        RandomNumberGenerator.Create().GetBytes(salt);
 
         var hash = GetPbkdf2Bytes(password, salt, Pbkdf2Iterations, HashByteSize);
         return Pbkdf2Iterations +

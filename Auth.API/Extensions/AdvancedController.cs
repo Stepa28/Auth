@@ -38,7 +38,7 @@ public class AdvancedController : Controller
             return tmp.Microservice;
 
         var ex = new ForbiddenException("Your ip is not registered");
-        _logger.LogError(ex, "");
+        _logger.LogError(ex, ex.Message);
         throw ex;
     }
 

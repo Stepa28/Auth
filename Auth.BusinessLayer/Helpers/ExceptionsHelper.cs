@@ -23,7 +23,7 @@ public class ExceptionsHelper : IExceptionsHelper
             return;
 
         var ex = new NotFoundException(Format(NotFound, email));
-        _logger.LogError(ex, "");
+        _logger.LogError(ex, ex.Message);
         throw ex;
     }
 
@@ -33,7 +33,7 @@ public class ExceptionsHelper : IExceptionsHelper
             return;
 
         var ex = new IncorrectPasswordException(PasswordIsIncorrected);
-        _logger.LogError(ex, "");
+        _logger.LogError(ex, ex.Message);
         throw ex;
     }
 }

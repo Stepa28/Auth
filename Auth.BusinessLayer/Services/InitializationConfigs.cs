@@ -31,19 +31,21 @@ public class InitializationConfigs : IInitializationConfigs
         try
         {
             response = _requestHelper.SendRequestAsync<IEnumerable<ConfigExchangeModel>>(_config[$"{Microservice.MarvelousConfigs}Url"],
-                "/api/microservices",
+                "/api/configs/by-serviceAddress",
                 Method.Get,
                 Microservice.MarvelousConfigs,
                 token).Result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to initialize configs from {Microservice.MarvelousConfigs} service");
+            _logger.LogWarning(ex, $"Failed to initialize configs from {Microservice.MarvelousConfigs} service({ex.Message})");
             _logger.LogInformation("Start initialize default config");
             for (var i = Microservice.MarvelousAccountChecking; i <= Microservice.MarvelousSmsSendler; i++)
             {
                 _config[i.ToString()] = "::1";
             }
+            _config[$"{Microservice.MarvelousCrm}Url"] = "https://piter-education.ru:5050";
+            _config[$"{Microservice.MarvelousReporting}Url"] = "https://piter-education.ru:6010";
             return;
         }
 

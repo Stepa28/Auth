@@ -90,7 +90,7 @@ public static class BuilderServicesExtensions
         service.AddLogging(loggingBuilder =>
         {
             loggingBuilder.ClearProviders();
-            loggingBuilder.SetMinimumLevel(LogLevel.Debug);
+            loggingBuilder.SetMinimumLevel(LogLevel.Information);
             loggingBuilder.AddNLog(config);
         });
     }

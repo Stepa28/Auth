@@ -45,7 +45,7 @@ public class InitializationLeads : IInitializationLeads
             if (response is null)
             {
                 var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
-                _logger.LogCritical(message);
+                _logger.LogWarning(message);
                 await _producer.NotifyFatalError(message);
                 return;
             }
@@ -73,7 +73,7 @@ public class InitializationLeads : IInitializationLeads
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to initialize from {service} service");
+            _logger.LogError(ex, $"Failed to initialize from {service} service ({ex.Message})");
         }
 
         return response;

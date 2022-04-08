@@ -38,7 +38,7 @@ public class AuthService : IAuthService
         if (!_cache.Get<bool>("Initialization"))
         {
             var ex = new ServiceUnavailableException("Microservice initialize leads was not completed");
-            _logger.LogError(ex, "");
+            _logger.LogError(ex, ex.Message);
             throw ex;
         }
 
@@ -79,7 +79,7 @@ public class AuthService : IAuthService
         if (!audiencesFromToken.Contains(service.ToString()))
         {
             var ex = new ForbiddenException($"You don't have access to {service}");
-            _logger.LogError(ex, "Not contain from audiences");
+            _logger.LogError(ex, $"Not contain from audiences ({ex.Message})");
             throw ex;
         }
 
@@ -102,7 +102,7 @@ public class AuthService : IAuthService
         if (!audiencesFromToken.Contains(frontendFromService))
         {
             var ex = new ForbiddenException($"{frontendFromService} does not have access");
-            _logger.LogError(ex, $"The token was not issued for {frontendFromService}");
+            _logger.LogError(ex, $"The token was not issued for {frontendFromService} ({ex.Message})");
             throw ex;
         }
 
