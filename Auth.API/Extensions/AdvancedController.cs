@@ -39,18 +39,18 @@ public class AdvancedController : Controller
 
         if (HttpContext.Request.Headers[nameof(Microservice)].Count == 0)
         {
-            var ex = new ForbiddenException("Failed to identify service");
+            var ex = new ForbiddenException("Failed to identify service (no head)");
             _logger.LogError(ex, ex.Message);
             throw ex;
         }
 
         var tmp = _cache.GetOrCreate(nameof(Microservice),
                             (ICacheEntry _) => InitializeMicroserviceModels.InitializeMicroservices())
-                        .FirstOrDefault(t => t.Key.ToString().Equals(HttpContext.Request.Headers[nameof(Microservice)][0])).Value;
+                        .FirstOrDefault(t => t.Key.ToString().Equals(HttpContext.Request.Headers[nameof(Microservice)].First())).Value;
 
         if (tmp is null)
         {
-            var ex = new ForbiddenException("Failed to identify service");
+            var ex = new ForbiddenException("Failed to identify service (invalid head)");
             _logger.LogError(ex, ex.Message);
             throw ex;
         }

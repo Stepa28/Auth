@@ -44,22 +44,23 @@ public class InitializationLeads : IInitializationLeads
             response = await GetRestResponse(ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token);
             if (response is null)
             {
-                var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
+                var message = $"Initialization leads with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
                 _logger.LogWarning(message);
                 await _producer.NotifyErrorByEmail(message);
                 return;
             }
-            _logger.LogInformation("Initialization from service Reporting: completed successfully");
+            _logger.LogInformation("Response from service Reporting: received successfully");
         }
         else
         {
-            _logger.LogInformation("Initialization from service CRM: completed successfully");
+            _logger.LogInformation("Response from service CRM: received successfully");
         }
 
         foreach (var entity in response.Data!)
         {
             _cache.Set(entity.Email, _mapper.Map<LeadAuthModel>(entity));
         }
+        _logger.LogInformation("Initialization leads: completed successfully");
         _cache.Set("Initialization leads", true);
     }
 

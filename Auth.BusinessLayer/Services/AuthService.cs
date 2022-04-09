@@ -64,8 +64,8 @@ public class AuthService : IAuthService
     public bool CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
     {
         _logger.LogInformation($"Received a request to validate a microservices token from {service}");
-        var issuerMicroserviceModel = Microservices.FirstOrDefault(t => t.Key.ToString().Equals(issuerToken)).Value;
-        if (!issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
+        var issuerMicroserviceModel = Microservices.Values.FirstOrDefault(t => t.Microservice.ToString().Equals(issuerToken));
+        if (issuerMicroserviceModel == null || !issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
         {
             var ex = new AuthenticationException("Broken token");
             _logger.LogError(ex, "Token contains invalid data");

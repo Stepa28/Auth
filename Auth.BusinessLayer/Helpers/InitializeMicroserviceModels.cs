@@ -11,6 +11,7 @@ public static class InitializeMicroserviceModels
         OnlyConfigMicroservices(microservices,
             Microservice.MarvelousRatesApi,
             Microservice.MarvelousEmailSender,
+            Microservice.MarvelousSmsSender,
             Microservice.MarvelousAccountChecking,
             Microservice.MarvelousTransactionStore);
 

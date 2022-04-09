@@ -6,7 +6,6 @@ using Marvelous.Contracts.Endpoints;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.RequestModels;
 using Marvelous.Contracts.ResponseModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Swashbuckle.AspNetCore.Annotations;
@@ -58,7 +57,6 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/check-validate-token-microservices
     [HttpGet(AuthEndpoints.ValidationMicroservice)]
-    [Authorize]
     [ProducesResponseType(typeof(LeadIdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
@@ -66,7 +64,10 @@ public class AuthorizationsController : AdvancedController
     public ActionResult CheckTokenAmongMicroservices()
     {
         if (Issuer.Equals(Microservice.MarvelousAuth.ToString()))
+        {
+            _logger.LogInformation("Request received to verify token issued by MarvelousAuth");
             return Ok();
+        }
         
         _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Service);
         var lead = LeadIdentity;
@@ -78,7 +79,6 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/check-validate-token-front
     [HttpGet(AuthEndpoints.ValidationFront)]
-    [Authorize]
     [ProducesResponseType(typeof(LeadIdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
@@ -98,7 +98,6 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/hash-password
     [HttpPost(AuthEndpoints.HashPassword)]
-    [Authorize]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
