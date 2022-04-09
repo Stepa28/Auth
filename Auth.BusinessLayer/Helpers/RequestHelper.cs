@@ -8,14 +8,10 @@ namespace Auth.BusinessLayer.Helpers;
 
 public class RequestHelper : IRequestHelper
 {
-
-    public async Task<RestResponse<T>> SendRequestAsync<T>(string url, string path, Method method, Microservice service, string jwtToken)
+    public async Task<RestResponse<T>> SendRequest<T>(string url, string path, Microservice service, string jwtToken)
     {
-        var request = new RestRequest(path, method);
-        var client = new RestClient(new RestClientOptions(url)
-        {
-            Timeout = 300000
-        });
+        var request = new RestRequest(path);
+        var client = new RestClient(url);
         client.Authenticator = new JwtAuthenticator(jwtToken);
         client.AddDefaultHeader(nameof(Microservice), Microservice.MarvelousAuth.ToString());
         var response = await client.ExecuteAsync<T>(request);
@@ -37,6 +33,6 @@ public class RequestHelper : IRequestHelper
                 throw new BadGatewayException($"Error on {service}. {response.ErrorException!.Message}");
         }
         if (response.Data is null)
-            throw new BadGatewayException($"Content equal's null {response.ErrorException!.Message}");
+            throw new BadGatewayException($"Failed to convert data {response.ErrorException!.Message}");
     }
 }

@@ -4,7 +4,7 @@ using Auth.BusinessLayer.Services;
 using AutoMapper;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ExchangeModels;
-using Marvelous.Contracts.Urls;
+using Marvelous.Contracts.Endpoints;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -38,10 +38,10 @@ public class InitializationLeads : IInitializationLeads
         _cache.Set("Initialization leads", false);
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
         
-        var response = await GetRestResponse(CrmUrls.LeadApi + CrmUrls.Auth, Microservice.MarvelousCrm, token);
+        var response = await GetRestResponse(CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token);
         if (response is null)
         {
-            response = await GetRestResponse(ReportingUrls.ApiLeads + ReportingUrls.GetAllLeads, Microservice.MarvelousReporting, token);
+            response = await GetRestResponse(ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token);
             if (response is null)
             {
                 var message = $"Initialization with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed";
@@ -69,7 +69,7 @@ public class InitializationLeads : IInitializationLeads
         RestResponse<IEnumerable<LeadAuthExchangeModel>>? response = null;
         try
         {
-            response = await _requestHelper.SendRequestAsync<IEnumerable<LeadAuthExchangeModel>>(_config[$"{service}Url"], path, Method.Get, service, token);
+            response = await _requestHelper.SendRequest<IEnumerable<LeadAuthExchangeModel>>(_config[$"{service}Url"], path, service, token);
         }
         catch (Exception ex)
         {

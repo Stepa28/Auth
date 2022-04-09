@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Security.Principal;
 using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Helpers;
-using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
+using Marvelous.Contracts.ResponseModels;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +12,10 @@ namespace Auth.API.Extensions;
 
 public class AdvancedController : Controller
 {
-    protected Microservice Service => GetMicroserviceWhoUseEndpointByIp();
+    protected Microservice Service => GetMicroserviceWhoUseEndpoint();
     protected string Audience => GetAudienceFromToken();
     protected string Issuer => GetIssuerFromToken();
+    protected LeadIdentityResponseModel? LeadIdentity => TryGetLeadIdentityFromToken();
 
     private readonly ILogger _logger;
     private readonly IMemoryCache _cache;
@@ -27,7 +28,7 @@ public class AdvancedController : Controller
         _config = config;
     }
 
-    private Microservice GetMicroserviceWhoUseEndpointByIp()
+    private Microservice GetMicroserviceWhoUseEndpoint()
     {
         if (!_config["BaseAddress"].Equals(HttpContext.Connection.RemoteIpAddress!.ToString()))
         {
@@ -67,6 +68,16 @@ public class AdvancedController : Controller
     {
         var claim = CheckUserIdentityContainAudience(User.Identity);
         return claim.Issuer;
+    }
+
+    private LeadIdentityResponseModel? TryGetLeadIdentityFromToken()
+    {
+        if (User.Identity is not ClaimsIdentity identity)
+            return null;
+
+        return int.TryParse(identity.FindFirst(ClaimTypes.UserData)?.Value, out var userId)
+            ? new LeadIdentityResponseModel { Id = userId, Role = identity.FindFirst(ClaimTypes.Role).Value }
+            : null;
     }
 
     private Claim CheckUserIdentityContainAudience(IIdentity? userIdentity)

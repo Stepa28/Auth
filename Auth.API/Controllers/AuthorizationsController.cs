@@ -1,10 +1,11 @@
 ﻿using Auth.API.Extensions;
+using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Security;
 using Auth.BusinessLayer.Services;
+using Marvelous.Contracts.Endpoints;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.RequestModels;
 using Marvelous.Contracts.ResponseModels;
-using Marvelous.Contracts.Urls;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,7 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Auth.API.Controllers;
 
 [ApiController]
-[Route(AuthUrls.ApiAuth)]
+[Route(AuthEndpoints.ApiAuth)]
 public class AuthorizationsController : AdvancedController
 {
     private readonly IAuthService _authService;
@@ -27,7 +28,7 @@ public class AuthorizationsController : AdvancedController
     }
 
     //api/auth/login
-    [HttpPost(AuthUrls.Login)]
+    [HttpPost(AuthEndpoints.Login)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
@@ -43,7 +44,7 @@ public class AuthorizationsController : AdvancedController
     }
 
     //api/auth/token-microservice
-    [HttpGet(AuthUrls.TokenForMicroservice)]
+    [HttpGet(AuthEndpoints.TokenForMicroservice)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [SwaggerOperation("Get a token for microservice")]
@@ -56,37 +57,47 @@ public class AuthorizationsController : AdvancedController
     }
 
     //api/auth/check-validate-token-microservices
-    [HttpGet(AuthUrls.ValidationMicroservice)]
+    [HttpGet(AuthEndpoints.ValidationMicroservice)]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LeadIdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate token among microservices")]
     public ActionResult CheckTokenAmongMicroservices()
     {
         if (Issuer.Equals(Microservice.MarvelousAuth.ToString()))
-        {
             return Ok();
-        }
+        
         _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Service);
+        var lead = LeadIdentity;
+
+        if (lead != null)
+            return Ok(lead);
         return Ok();
     }
 
     //api/auth/check-validate-token-front
-    [HttpGet(AuthUrls.ValidationFront)]
+    [HttpGet(AuthEndpoints.ValidationFront)]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LeadIdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate frontend token")]
     public ActionResult CheckTokenFrontend()
     {
         _authService.CheckValidTokenFrontend(Issuer, Audience, Service);
-        return Ok();
+        var lead = LeadIdentity;
+
+        if (lead != null)
+            return Ok(lead);
+
+        var ex = new ForbiddenException($"Failed to get lead data from token ({Service})");
+        _logger.LogWarning(ex, ex.Message);
+        throw ex;
     }
 
     //api/auth/hash-password
-    [HttpPost(AuthUrls.HashPassword)]
+    [HttpPost(AuthEndpoints.HashPassword)]
     [Authorize]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]

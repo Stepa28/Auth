@@ -1,9 +1,9 @@
 ﻿using Auth.BusinessLayer.Services;
+using Marvelous.Contracts.Endpoints;
 using Marvelous.Contracts.Enums;
-using Marvelous.Contracts.ExchangeModels;
+using Marvelous.Contracts.ResponseModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using RestSharp;
 
 namespace Auth.BusinessLayer.Helpers;
 
@@ -34,9 +34,8 @@ public class InitializationConfigs : IInitializationConfigs
 
         try
         {
-            var response = _requestHelper.SendRequestAsync<IEnumerable<ConfigExchangeModel>>(_config[$"{Microservice.MarvelousConfigs}Url"],
-                "/api/configs/by-service",
-                Method.Get,
+            var response = _requestHelper.SendRequest<IEnumerable<ConfigResponseModel>>(_config[$"{Microservice.MarvelousConfigs}Url"],
+                ConfigsEndpoints.Configs,
                 Microservice.MarvelousConfigs,
                 token).Result;
 

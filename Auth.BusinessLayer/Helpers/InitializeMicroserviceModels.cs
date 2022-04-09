@@ -10,7 +10,7 @@ public static class InitializeMicroserviceModels
         var microservices = new Dictionary<Microservice, MicroserviceModel>();
         OnlyConfigMicroservices(microservices,
             Microservice.MarvelousRatesApi,
-            Microservice.MarvelousEmailSendler,
+            Microservice.MarvelousEmailSender,
             Microservice.MarvelousAccountChecking,
             Microservice.MarvelousTransactionStore);
 
