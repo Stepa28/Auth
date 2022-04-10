@@ -1,4 +1,5 @@
-﻿using Auth.BusinessLayer.Services;
+﻿using Auth.BusinessLayer.Producers;
+using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Endpoints;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ResponseModels;
@@ -13,13 +14,15 @@ public class InitializationConfigs : IInitializationConfigs
     private readonly ILogger<InitializationConfigs> _logger;
     private readonly IRequestHelper _requestHelper;
     private readonly IAuthService _authService;
+    private readonly IAuthProducer _producer;
 
-    public InitializationConfigs(IConfiguration config, ILogger<InitializationConfigs> logger, IRequestHelper requestHelper, IAuthService authService)
+    public InitializationConfigs(IConfiguration config, ILogger<InitializationConfigs> logger, IRequestHelper requestHelper, IAuthService authService, IAuthProducer producer)
     {
         _config = config;
         _logger = logger;
         _requestHelper = requestHelper;
         _authService = authService;
+        _producer = producer;
     }
 
     public void InitializeConfigs()
@@ -39,15 +42,17 @@ public class InitializationConfigs : IInitializationConfigs
                 Microservice.MarvelousConfigs,
                 token).Result;
 
-            _logger.LogInformation($"Start initialize from {Microservice.MarvelousConfigs} service configs");
             foreach (var config in response.Data!)
             {
                 _config[config.Key] = config.Value;
             }
+            _logger.LogInformation($"Initialize from {Microservice.MarvelousConfigs} service: completed successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, $"Failed to initialize configs from {Microservice.MarvelousConfigs} service({ex.Message})");
+            var message = $"Failed to initialize configs from {Microservice.MarvelousConfigs} service({ex.Message})";
+            _logger.LogWarning(ex, message);
+            _producer.NotifyErrorByEmail(message);
         }
     }
 }
