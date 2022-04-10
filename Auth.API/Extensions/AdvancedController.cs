@@ -15,7 +15,7 @@ public class AdvancedController : Controller
     protected Microservice Service => GetMicroserviceWhoUseEndpoint();
     protected string Audience => GetAudienceFromToken();
     protected string Issuer => GetIssuerFromToken();
-    protected LeadIdentityResponseModel? LeadIdentity => TryGetLeadIdentityFromToken();
+    protected IdentityResponseModel Identity => IdentityFromToken();
 
     private readonly ILogger _logger;
     private readonly IMemoryCache _cache;
@@ -70,14 +70,18 @@ public class AdvancedController : Controller
         return claim.Issuer;
     }
 
-    private LeadIdentityResponseModel? TryGetLeadIdentityFromToken()
+    private IdentityResponseModel IdentityFromToken()
     {
         if (User.Identity is not ClaimsIdentity identity)
-            return null;
+        {
+            var ex = new AuthenticationException("Broken token");
+            _logger.LogError(ex, "Token doesn't contain claims, possible expiration or incorrect secret key");
+            throw ex;
+        }
 
         return int.TryParse(identity.FindFirst(ClaimTypes.UserData)?.Value, out var userId)
-            ? new LeadIdentityResponseModel { Id = userId, Role = identity.FindFirst(ClaimTypes.Role).Value }
-            : null;
+            ? new IdentityResponseModel { Id = userId, Role = identity.FindFirst(ClaimTypes.Role).Value, IssuerMicroservice = Issuer }
+            : new IdentityResponseModel { IssuerMicroservice = Issuer };
     }
 
     private Claim CheckUserIdentityContainAudience(IIdentity? userIdentity)

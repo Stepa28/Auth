@@ -57,7 +57,7 @@ public class AuthorizationsController : AdvancedController
 
     //api/auth/check-validate-token-microservices
     [HttpGet(AuthEndpoints.ValidationMicroservice)]
-    [ProducesResponseType(typeof(LeadIdentityResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate token among microservices")]
@@ -66,30 +66,26 @@ public class AuthorizationsController : AdvancedController
         if (Issuer.Equals(Microservice.MarvelousAuth.ToString()))
         {
             _logger.LogInformation("Request received to verify token issued by MarvelousAuth");
-            return Ok();
+            return Ok(Identity);
         }
         
         _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Service);
-        var lead = LeadIdentity;
-
-        if (lead != null)
-            return Ok(lead);
-        return Ok();
+        return Ok(Identity);
     }
 
     //api/auth/check-validate-token-front
     [HttpGet(AuthEndpoints.ValidationFront)]
-    [ProducesResponseType(typeof(LeadIdentityResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [SwaggerOperation("Check validate frontend token")]
     public ActionResult CheckTokenFrontend()
     {
         _authService.CheckValidTokenFrontend(Issuer, Audience, Service);
-        var lead = LeadIdentity;
+        var identity = Identity;
 
-        if (lead != null)
-            return Ok(lead);
+        if (identity.Id != null)
+            return Ok(identity);
 
         var ex = new ForbiddenException($"Failed to get lead data from token ({Service})");
         _logger.LogWarning(ex, ex.Message);
