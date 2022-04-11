@@ -18,12 +18,14 @@ public class AuthorizationsController : AdvancedController
 {
     private readonly IAuthService _authService;
     private readonly ILogger<AuthorizationsController> _logger;
+    private readonly IMemoryCache _cache;
 
     public AuthorizationsController(IAuthService authService, ILogger<AuthorizationsController> logger, IMemoryCache cache, IConfiguration config)
         : base(logger, cache, config)
     {
         _authService = authService;
         _logger = logger;
+        _cache = cache;
     }
 
     //api/auth/login
@@ -35,6 +37,7 @@ public class AuthorizationsController : AdvancedController
     [SwaggerOperation("Get a token for font and microservice")]
     public ActionResult<string> Login([FromBody] AuthRequestModel auth)
     {
+        _cache.Get<Task>("Initialization task lead").Wait();
         _logger.LogInformation($"Received a request to receive a token by email = {auth.Email.Encryptor()}");
         var token = _authService.GetTokenForFront(auth.Email, auth.Password, Service);
         _logger.LogInformation("Token sent");

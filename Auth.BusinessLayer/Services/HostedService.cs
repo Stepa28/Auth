@@ -22,20 +22,28 @@ public class HostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var taskConfig = new Task(() => _configs.InitializeConfigs());
+        _cache.Set("Initialization task configs", taskConfig);
+        var taskLead = new Task(() => _leads.InitializeLeadsAsync().Wait(stoppingToken));
+        _cache.Set("Initialization task lead", taskLead);
+
         if (!await WaitForAppStartup(_lifetime, stoppingToken))
             return;
         // Приложение запущено и готово к обработке запросов
 
+
         //запуск инициализации моделей микросервисов
         _cache.Set(nameof(Microservice), InitializeMicroserviceModels.InitializeMicroservices());
-        
+
         //запуск инициализации конфигурации
-        _configs.InitializeConfigs();
+        taskConfig.Start();
+        await taskConfig.WaitAsync(stoppingToken);
 
         //запуск инициализации кеша лидов(если не удалось повторить через час)
         do
         {
-            await _leads.InitializeLeadsAsync();
+            taskLead.Start();
+            await taskLead.WaitAsync(stoppingToken);
             if (_cache.Get<bool>("Initialization leads"))
                 return;
             await Task.Delay(TimeSpan.FromHours(1), stoppingToken);

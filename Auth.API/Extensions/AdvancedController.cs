@@ -30,6 +30,7 @@ public class AdvancedController : Controller
 
     private Microservice GetMicroserviceWhoUseEndpoint()
     {
+        _cache.Get<Task>("Initialization task configs").Wait();
         if (!_config["BaseAddress"].Equals(HttpContext.Connection.RemoteIpAddress!.ToString()))
         {
             var ex = new ForbiddenException("Your ip is not registered");
