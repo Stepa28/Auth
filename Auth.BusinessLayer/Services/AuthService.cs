@@ -107,6 +107,42 @@ public class AuthService : IAuthService
         return true;
     }
 
+    public bool CheckDoubleValidToken(string issuerToken, string audienceToken, Microservice service)
+    {
+        _logger.LogInformation($"Token double validation request received({service})");
+
+        if (issuerToken.Equals(service.ToString()))
+        {
+            var frontendFromService = Microservices[service].Frontend.ToString();
+            if (!audienceToken.Split(',').Contains(frontendFromService))
+            {
+                var ex = new ForbiddenException($"{frontendFromService} does not have access");
+                _logger.LogError(ex, $"The token was not issued for {frontendFromService} ({ex.Message})");
+                throw ex;
+            }
+        }
+        else
+        {
+            var issuerMicroserviceModel = Microservices.Values.FirstOrDefault(t => t.Microservice.ToString().Equals(issuerToken));
+            if (issuerMicroserviceModel == null || !issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
+            {
+                var ex = new AuthenticationException("Broken token");
+                _logger.LogError(ex, "Token contains invalid data");
+                throw ex;
+            }
+
+            if (!audienceToken.Split(',').Contains(service.ToString()))
+            {
+                var ex = new ForbiddenException($"You don't have access to {service}");
+                _logger.LogError(ex, $"Not contain from audiences ({ex.Message})");
+                throw ex;
+            }
+        }
+
+        _logger.LogInformation("Verification token was successful");
+        return true;
+    }
+
     public string GetHashPassword(string password)
     {
         return PasswordHash.HashPassword(password);

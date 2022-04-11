@@ -8,5 +8,6 @@ public interface IAuthService
     string GetTokenForMicroservice(Microservice service);
     bool CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service);
     bool CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service);
+    bool CheckDoubleValidToken(string issuerToken, string audienceToken, Microservice service);
     string GetHashPassword(string password);
 }

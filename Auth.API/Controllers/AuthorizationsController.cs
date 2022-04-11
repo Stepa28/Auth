@@ -91,6 +91,18 @@ public class AuthorizationsController : AdvancedController
         _logger.LogWarning(ex, ex.Message);
         throw ex;
     }
+    
+    //api/auth/check-double-validate-token/
+    [HttpGet("check-double-validate-token/")]
+    [ProducesResponseType(typeof(IdentityResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
+    [SwaggerOperation("Check double validate token")]
+    public ActionResult DoubleCheckToken()
+    {
+        _authService.CheckDoubleValidToken(Issuer, Audience, Service);
+        return Ok(Identity);
+    }
 
     //api/auth/hash-password
     [HttpPost(AuthEndpoints.HashPassword)]
