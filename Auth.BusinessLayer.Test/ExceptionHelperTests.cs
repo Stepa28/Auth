@@ -9,17 +9,13 @@ namespace Auth.BusinessLayer.Test;
 
 public class ExceptionHelperTests
 {
-    private readonly Mock<ILogger<ExceptionsHelper>> _logger;
+    private Mock<ILogger<ExceptionsHelper>> _logger;
     private IExceptionsHelper _helper;
-
-    public ExceptionHelperTests()
-    {
-        _logger = new Mock<ILogger<ExceptionsHelper>>();
-    }
 
     [SetUp]
     public void SetUp()
     {
+        _logger = new Mock<ILogger<ExceptionsHelper>>();
         _helper = new ExceptionsHelper(_logger.Object);
     }
 
@@ -47,8 +43,9 @@ public class ExceptionHelperTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
     }
-    
+
     [Test]
     public void ThrowIfPasswordIsIncorrectedTest()
     {
@@ -73,5 +70,6 @@ public class ExceptionHelperTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
     }
 }

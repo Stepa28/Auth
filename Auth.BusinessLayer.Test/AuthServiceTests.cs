@@ -7,6 +7,7 @@ using System.Text;
 using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Models;
+using Auth.BusinessLayer.Security;
 using Auth.BusinessLayer.Services;
 using Auth.BusinessLayer.Test.TestCaseSources;
 using Marvelous.Contracts.Enums;
@@ -58,7 +59,10 @@ public class AuthServiceTests
         var actual = _authService.GetTokenForFront(email, "", service);
 
         //then
-        Assert.AreEqual(expected, actual);
+        Assert.AreEqual(expected.Split('.')[0], actual.Split('.')[0]);
+        Assert.AreEqual(expected.Split('.')[1].Length, actual.Split('.')[1].Length);
+        Assert.AreEqual(expected.Split('.')[2].Length, actual.Split('.')[2].Length);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -72,6 +76,7 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -87,6 +92,7 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -102,6 +108,7 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm)]
@@ -116,7 +123,10 @@ public class AuthServiceTests
         var actual = _authService.GetTokenForMicroservice(service);
 
         //then
-        Assert.AreEqual(expected, actual);
+        Assert.AreEqual(expected.Split('.')[0], actual.Split('.')[0]);
+        Assert.AreEqual(expected.Split('.')[1].Length, actual.Split('.')[1].Length);
+        Assert.AreEqual(expected.Split('.')[2].Length, actual.Split('.')[2].Length);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 1);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousAuth)]
@@ -129,6 +139,7 @@ public class AuthServiceTests
 
         //then
         Assert.IsTrue(actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 2);
     }
 
     [Test]
@@ -143,6 +154,8 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 1);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
@@ -159,6 +172,8 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 1);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
     }
 
     [TestCase(Microservice.MarvelousCrm)]
@@ -171,6 +186,7 @@ public class AuthServiceTests
 
         //then
         Assert.IsTrue(actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 2);
     }
 
     [Test]
@@ -185,6 +201,8 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 1);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -200,6 +218,105 @@ public class AuthServiceTests
 
         //then
         Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 1);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
+    }
+
+    [TestCase(Microservice.MarvelousCrm)]
+    [TestCase(Microservice.MarvelousResource)]
+    [TestCase(Microservice.MarvelousReporting)]
+    public void CheckDoubleValidTokenTest_Frontend(Microservice service)
+    {
+        //when
+        var actual = _authService.CheckDoubleValidToken(service.ToString(), _microservices[service].ServicesThatHaveAccess, service);
+
+        //then
+        Assert.IsTrue(actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 3);
+    }
+
+    [Test]
+    public void CheckDoubleValidTokenNegativeTest_Frontend_ForbiddenException()
+    {
+        //given
+        var expected = $"{Microservice.MarvelousFrontendCrm} does not have access";
+
+        //when
+        var actual = Assert.Throws<ForbiddenException>(() => _authService.CheckDoubleValidToken(Microservice.MarvelousCrm.ToString(),
+            _microservices[Microservice.MarvelousReporting].ServicesThatHaveAccess,
+            Microservice.MarvelousCrm))!.Message;
+
+        //then
+        Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 2);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
+    }
+
+    [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousAuth)]
+    [TestCase(Microservice.MarvelousResource, Microservice.MarvelousCrm)]
+    [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousTransactionStore)]
+    public void CheckDoubleValidTokenTest_Microservice(Microservice issuerToken, Microservice service)
+    {
+        //when
+        var actual = _authService.CheckDoubleValidToken(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service);
+
+        //then
+        Assert.IsTrue(actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 3);
+    }
+
+    [Test]
+    public void CheckDoubleValidTokenNegativeTest_Microservice_AuthenticationException()
+    {
+        //given
+        var expected = "Broken token";
+
+        //when
+        var actual = Assert.Throws<AuthenticationException>(() =>
+            _authService.CheckDoubleValidToken(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
+
+        //then
+        Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 2);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
+    }
+
+    [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
+    [TestCase(Microservice.MarvelousTransactionStore, Microservice.MarvelousReporting)]
+    [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
+    public void CheckDoubleValidTokenNegativeTest_Microservice_ForbiddenException(Microservice issuerToken, Microservice service)
+    {
+        //given
+        var expected = $"You don't have access to {service}";
+
+        //when
+        var actual = Assert.Throws<ForbiddenException>(() =>
+            _authService.CheckDoubleValidToken(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service))!.Message;
+
+        //then
+        Assert.AreEqual(expected, actual);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Information, 2);
+        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
+    }
+
+    [TestCase("gaga4982")]
+    [TestCase("")]
+    [TestCase("     ")]
+    public void GetHashPasswordTest(string passwordForTest)
+    {
+        //given
+        string password = passwordForTest;
+        string expected = PasswordHashTests.CalcHash(password);
+
+        //when
+        string actual = _authService.GetHashPassword(password);
+
+        //then
+        Assert.AreEqual(actual.Split(":")[0], expected.Split(":")[0]);
+        Assert.AreEqual(actual.Split(":")[1].Length, expected.Split(":")[1].Length);
+        Assert.AreEqual(actual.Split(":")[2].Length, expected.Split(":")[2].Length);
+        Assert.AreEqual(Convert.FromBase64String(actual.Split(":")[1]).Length, PasswordHash.SaltByteSize);
+        Assert.AreEqual(Convert.FromBase64String(actual.Split(":")[2]).Length, PasswordHash.HashByteSize);
     }
 
     private string GenerateToken(Microservice issuerService, IEnumerable<Claim>? claims = null)

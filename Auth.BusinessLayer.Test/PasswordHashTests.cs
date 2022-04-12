@@ -41,11 +41,10 @@ public class PasswordHashTests
         Assert.AreEqual(actual, expected);
     }
 
-    private string CalcHash(string password)
+    internal static string CalcHash(string password)
     {
         var salt = new byte[PasswordHash.SaltByteSize];
-        var provider = new RNGCryptoServiceProvider();
-        provider.GetBytes(salt);
+        RandomNumberGenerator.Create().GetBytes(salt);
         var hash = new Rfc2898DeriveBytes(password, salt)
             {
                 IterationCount = PasswordHash.Pbkdf2Iterations
