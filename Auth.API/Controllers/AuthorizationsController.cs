@@ -96,7 +96,7 @@ public class AuthorizationsController : AdvancedController
     }
     
     //api/auth/check-double-validate-token/
-    [HttpGet("check-double-validate-token/")]
+    [HttpGet(AuthEndpoints.DoubleValidation)]
     [ProducesResponseType(typeof(IdentityResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
@@ -107,16 +107,15 @@ public class AuthorizationsController : AdvancedController
         return Ok(Identity);
     }
 
-    //api/auth/hash-password
-    [HttpPost(AuthEndpoints.HashPassword)]
+    //api/auth/hashing/
+    [HttpPost(AuthEndpoints.Hash)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
-    [SwaggerOperation("Hashing password")]
-    public ActionResult<string> GetHashPassword([FromBody] string password)
+    [SwaggerOperation("Get the string hash of a string")]
+    public ActionResult<string> GetHashingString([FromBody] string password)
     {
         _logger.LogInformation($"{Service} asked to hashing password");
-        _authService.CheckValidTokenAmongMicroservices(Issuer, Audience, Microservice.MarvelousAuth);
         var hash = _authService.GetHashPassword(password);
         _logger.LogInformation("Hash password send");
 

@@ -39,8 +39,6 @@ public class AuthService : IAuthService
             throw ex;
         }
 
-        _logger.LogInformation($"Authorization attempt with email = {email.Encryptor()}({service})");
-
         var entity = _cache.Get<LeadAuthModel>(email);
         _exceptionsHelper.ThrowIfEmailNotFound(email, entity);
         _exceptionsHelper.ThrowIfPasswordIsIncorrected(pass, entity.HashPassword);
@@ -112,34 +110,10 @@ public class AuthService : IAuthService
         _logger.LogInformation($"Token double validation request received({service})");
 
         if (issuerToken.Equals(service.ToString()))
-        {
-            var frontendFromService = Microservices[service].Frontend.ToString();
-            if (!audienceToken.Split(',').Contains(frontendFromService))
-            {
-                var ex = new ForbiddenException($"{frontendFromService} does not have access");
-                _logger.LogError(ex, $"The token was not issued for {frontendFromService} ({ex.Message})");
-                throw ex;
-            }
-        }
+            CheckValidTokenFrontend(issuerToken, audienceToken, service);
         else
-        {
-            var issuerMicroserviceModel = Microservices.Values.FirstOrDefault(t => t.Microservice.ToString().Equals(issuerToken));
-            if (issuerMicroserviceModel == null || !issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
-            {
-                var ex = new AuthenticationException("Broken token");
-                _logger.LogError(ex, "Token contains invalid data");
-                throw ex;
-            }
+            CheckValidTokenAmongMicroservices(issuerToken, audienceToken, service);
 
-            if (!audienceToken.Split(',').Contains(service.ToString()))
-            {
-                var ex = new ForbiddenException($"You don't have access to {service}");
-                _logger.LogError(ex, $"Not contain from audiences ({ex.Message})");
-                throw ex;
-            }
-        }
-
-        _logger.LogInformation("Verification token was successful");
         return true;
     }
 
@@ -162,5 +136,5 @@ public class AuthService : IAuthService
     }
 
     private Dictionary<Microservice, MicroserviceModel> Microservices =>
-        _cache.GetOrCreate(nameof(Microservice), (ICacheEntry _) => InitializeMicroserviceModels.InitializeMicroservices());
+        _cache.GetOrCreate(nameof(Microservice), _ => InitializeMicroserviceModels.InitializeMicroservices());
 }

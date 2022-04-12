@@ -46,7 +46,7 @@ public class AdvancedController : Controller
         }
 
         var tmp = _cache.GetOrCreate(nameof(Microservice),
-                            (ICacheEntry _) => InitializeMicroserviceModels.InitializeMicroservices())
+                            _ => InitializeMicroserviceModels.InitializeMicroservices())
                         .FirstOrDefault(t => t.Key.ToString().Equals(HttpContext.Request.Headers[nameof(Microservice)].First())).Value;
 
         if (tmp is null)

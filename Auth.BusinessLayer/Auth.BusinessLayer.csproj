@@ -8,11 +8,11 @@
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="11.0.1" />
-        <PackageReference Include="Marvelous.Contracts" Version="1.1.29" />
+        <PackageReference Include="Marvelous.Contracts" Version="1.1.31" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.1" />
         <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
         <PackageReference Include="RestSharp" Version="107.3.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.16.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
     </ItemGroup>
 
     <ItemGroup>
