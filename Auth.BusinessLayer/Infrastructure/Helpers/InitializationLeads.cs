@@ -14,15 +14,16 @@ namespace Auth.BusinessLayer.Helpers;
 
 public class InitializationLeads : IInitializationLeads
 {
-    private readonly IRequestHelper _requestHelper;
+    private readonly IAuthService _authService;
+    private readonly IMemoryCache _cache;
+    private readonly IConfiguration _config;
     private readonly ILogger<InitializationLeads> _logger;
     private readonly IMapper _mapper;
-    private readonly IMemoryCache _cache;
     private readonly IAuthProducer _producer;
-    private readonly IAuthService _authService;
-    private readonly IConfiguration _config;
+    private readonly IRequestHelper<LeadAuthExchangeModel> _requestHelper;
 
-    public InitializationLeads(IRequestHelper requestHelper, ILogger<InitializationLeads> logger, IMapper mapper, IMemoryCache cache, IAuthProducer producer, IAuthService authService, IConfiguration config)
+    public InitializationLeads(IRequestHelper<LeadAuthExchangeModel> requestHelper, ILogger<InitializationLeads> logger, IMapper mapper, IMemoryCache cache,
+        IAuthProducer producer, IAuthService authService, IConfiguration config)
     {
         _requestHelper = requestHelper;
         _logger = logger;
@@ -37,7 +38,7 @@ public class InitializationLeads : IInitializationLeads
     {
         _cache.Set("Initialization leads", false);
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
-        
+
         var response = await GetRestResponse(CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token);
         if (response is null)
         {
@@ -70,7 +71,7 @@ public class InitializationLeads : IInitializationLeads
         RestResponse<IEnumerable<LeadAuthExchangeModel>>? response = null;
         try
         {
-            response = await _requestHelper.SendRequest<IEnumerable<LeadAuthExchangeModel>>(_config[$"{service}Url"], path, service, token);
+            response = await _requestHelper.SendRequest(_config[$"{service}Url"], path, service, token);
         }
         catch (Exception ex)
         {

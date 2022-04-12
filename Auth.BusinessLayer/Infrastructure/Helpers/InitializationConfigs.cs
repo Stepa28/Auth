@@ -10,13 +10,14 @@ namespace Auth.BusinessLayer.Helpers;
 
 public class InitializationConfigs : IInitializationConfigs
 {
+    private readonly IAuthService _authService;
     private readonly IConfiguration _config;
     private readonly ILogger<InitializationConfigs> _logger;
-    private readonly IRequestHelper _requestHelper;
-    private readonly IAuthService _authService;
     private readonly IAuthProducer _producer;
+    private readonly IRequestHelper<ConfigResponseModel> _requestHelper;
 
-    public InitializationConfigs(IConfiguration config, ILogger<InitializationConfigs> logger, IRequestHelper requestHelper, IAuthService authService, IAuthProducer producer)
+    public InitializationConfigs(IConfiguration config, ILogger<InitializationConfigs> logger, IRequestHelper<ConfigResponseModel> requestHelper,
+        IAuthService authService, IAuthProducer producer)
     {
         _config = config;
         _logger = logger;
@@ -37,7 +38,7 @@ public class InitializationConfigs : IInitializationConfigs
         try
         {
             _logger.LogInformation($"Attempt to initialize configs from {Microservice.MarvelousConfigs} service");
-            var response = _requestHelper.SendRequest<IEnumerable<ConfigResponseModel>>(_config[$"{Microservice.MarvelousConfigs}Url"],
+            var response = _requestHelper.SendRequest(_config[$"{Microservice.MarvelousConfigs}Url"],
                 ConfigsEndpoints.Configs,
                 Microservice.MarvelousConfigs,
                 token).Result;

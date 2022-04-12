@@ -1,25 +1,33 @@
 ﻿using Auth.BusinessLayer.Exceptions;
 using RestSharp;
 using System.Net;
+using FluentValidation;
 using Marvelous.Contracts.Enums;
 using RestSharp.Authenticators;
 
 namespace Auth.BusinessLayer.Helpers;
 
-public class RequestHelper : IRequestHelper
+public class RequestHelper<T> : IRequestHelper<T> where T : class, new()
 {
-    public async Task<RestResponse<T>> SendRequest<T>(string url, string path, Microservice service, string jwtToken)
+    private readonly IValidator<T> _validator;
+
+    public RequestHelper(IValidator<T> validator)
+    {
+        _validator = validator;
+    }
+
+    public async Task<RestResponse<IEnumerable<T>>> SendRequest(string url, string path, Microservice service, string jwtToken)
     {
         var request = new RestRequest(path);
         var client = new RestClient(url);
         client.Authenticator = new JwtAuthenticator(jwtToken);
         client.AddDefaultHeader(nameof(Microservice), Microservice.MarvelousAuth.ToString());
-        var response = await client.ExecuteAsync<T>(request);
+        var response = await client.ExecuteAsync<IEnumerable<T>>(request);
         CheckTransactionError(response, service);
         return response;
     }
 
-    private static void CheckTransactionError<T>(RestResponse<T> response, Microservice service)
+    private void CheckTransactionError(RestResponse<IEnumerable<T>> response, Microservice service)
     {
         switch (response.StatusCode)
         {
@@ -34,5 +42,8 @@ public class RequestHelper : IRequestHelper
         }
         if (response.Data is null)
             throw new BadGatewayException($"Failed to convert data {response.ErrorException!.Message}");
+
+        foreach (var entity in response.Data)
+            _validator.ValidateAndThrow(entity);
     }
 }

@@ -2,6 +2,7 @@
 using System.Security.Authentication;
 using System.Text.Json;
 using Auth.BusinessLayer.Exceptions;
+using FluentValidation;
 using Marvelous.Contracts.ResponseModels;
 using NLog;
 
@@ -43,6 +44,10 @@ public class ErrorExceptionMiddleware
         catch (ServiceUnavailableException ex)
         {
             await ConstructResponse(context, HttpStatusCode.ServiceUnavailable, ex.Message);
+        }
+        catch (ValidationException ex)
+        {
+            await ConstructResponse(context, HttpStatusCode.UnprocessableEntity, ex.Message);
         }
         catch (Exception ex)
         {

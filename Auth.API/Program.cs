@@ -21,12 +21,13 @@ var config = new ConfigurationBuilder()
              .AddXmlFile("NLog.config", true, true)
              .Build();
 
-builder.Services.RegisterServices();
+builder.Services.RegisterDi();
 builder.Services.RegisterLogger(config);
 builder.Services.AddMemoryCache();
 builder.Services.AddMassTransit();
 builder.Services.AddCustomAuth(secretKey);
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddFluentValidation();
 
 builder.Services.AddHostedService<HostedService>();
 

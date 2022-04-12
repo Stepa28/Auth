@@ -3,8 +3,14 @@ using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
+using Auth.BusinessLayer.Validation;
+using FluentValidation.AspNetCore;
+using Marvelous.Contracts.ExchangeModels;
+using Marvelous.Contracts.ResponseModels;
 using MassTransit;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
@@ -13,11 +19,12 @@ namespace Auth.API.Extensions;
 
 public static class BuilderServicesExtensions
 {
-    public static void RegisterServices(this IServiceCollection services)
+    public static void RegisterDi(this IServiceCollection services)
     {
         services.AddSingleton<IAuthService, AuthService>();
 
-        services.AddSingleton<IRequestHelper, RequestHelper>();
+        services.AddSingleton<IRequestHelper<ConfigResponseModel>, RequestHelper<ConfigResponseModel>>();
+        services.AddSingleton<IRequestHelper<LeadAuthExchangeModel>, RequestHelper<LeadAuthExchangeModel>>();
         services.AddSingleton<IAuthProducer, AuthProducer>();
         services.AddSingleton<IExceptionsHelper, ExceptionsHelper>();
         services.AddTransient<IInitializationLeads, InitializationLeads>();
@@ -81,6 +88,7 @@ public static class BuilderServicesExtensions
                 }
             });
         });
+        services.AddFluentValidationRulesToSwagger();
     }
 
     public static void RegisterLogger(this IServiceCollection service, IConfiguration config)
@@ -123,5 +131,19 @@ public static class BuilderServicesExtensions
                     });
             });
         });
+    }
+
+    public static void AddFluentValidation(this IServiceCollection services)
+    {
+        //Добавление FluentValidation
+        services.AddFluentValidation(fv =>
+        {
+            //Регистрация валидаторов по сборке с временем жизни = Singleton
+            fv.RegisterValidatorsFromAssemblyContaining<AuthRequestModelValidator>(lifetime: ServiceLifetime.Singleton);
+            //Отключение валидации с помощью DataAnnotations
+            fv.DisableDataAnnotationsValidation = true;
+        });
+        //Отключение стандартного валидатора
+        services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
     }
 }
