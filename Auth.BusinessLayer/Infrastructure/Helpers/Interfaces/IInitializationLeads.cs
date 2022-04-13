@@ -2,5 +2,5 @@
 
 public interface IInitializationLeads
 {
-    Task InitializeLeadsAsync();
+    Task InitializeLeads();
 }

@@ -2,9 +2,9 @@
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
 using AutoMapper;
+using Marvelous.Contracts.Endpoints;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ExchangeModels;
-using Marvelous.Contracts.Endpoints;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -34,7 +34,7 @@ public class InitializationLeads : IInitializationLeads
         _config = config;
     }
 
-    public async Task InitializeLeadsAsync()
+    public async Task InitializeLeads()
     {
         _cache.Set("Initialization leads", false);
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
@@ -58,9 +58,7 @@ public class InitializationLeads : IInitializationLeads
         }
 
         foreach (var entity in response.Data!)
-        {
             _cache.Set(entity.Email, _mapper.Map<LeadAuthModel>(entity));
-        }
         _logger.LogInformation("Initialization leads: completed successfully");
         _cache.Set("Initialization leads", true);
     }

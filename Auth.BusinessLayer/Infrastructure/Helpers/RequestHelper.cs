@@ -1,8 +1,8 @@
-﻿using Auth.BusinessLayer.Exceptions;
-using RestSharp;
-using System.Net;
+﻿using System.Net;
+using Auth.BusinessLayer.Exceptions;
 using FluentValidation;
 using Marvelous.Contracts.Enums;
+using RestSharp;
 using RestSharp.Authenticators;
 
 namespace Auth.BusinessLayer.Helpers;

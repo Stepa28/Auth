@@ -9,7 +9,7 @@ public class AuthProducer : IAuthProducer
 {
     private readonly IBus _bus;
     private readonly ILogger<AuthProducer> _logger;
-    
+
     public AuthProducer(IBus bus, ILogger<AuthProducer> logger)
     {
         _bus = bus;
@@ -23,11 +23,12 @@ public class AuthProducer : IAuthProducer
         _logger.LogInformation("Attempt to report failed initialization");
 
         await _bus.Publish<EmailErrorMessage>(new
-        {
-            ServiceName = Microservice.MarvelousAuth.ToString(),
-            TextMessage = message
-        }, source.Token);
-        
+            {
+                ServiceName = Microservice.MarvelousAuth.ToString(),
+                TextMessage = message
+            },
+            source.Token);
+
         _logger.LogInformation("Initialization failure alert sent");
     }
 }

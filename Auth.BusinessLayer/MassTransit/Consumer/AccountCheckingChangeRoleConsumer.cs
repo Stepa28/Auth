@@ -1,4 +1,5 @@
 ﻿using Auth.BusinessLayer.Models;
+using FluentValidation;
 using Marvelous.Contracts.ExchangeModels;
 using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,17 +10,22 @@ namespace Auth.BusinessLayer.Consumer;
 
 public class AccountCheckingChangeRoleConsumer : IConsumer<LeadShortExchangeModel[]>
 {
-    private readonly ILogger<AccountCheckingChangeRoleConsumer> _logger;
     private readonly IMemoryCache _cache;
+    private readonly ILogger<AccountCheckingChangeRoleConsumer> _logger;
+    private readonly IValidator<LeadShortExchangeModel> _validator;
 
-    public AccountCheckingChangeRoleConsumer(ILogger<AccountCheckingChangeRoleConsumer> logger, IMemoryCache cache)
+    public AccountCheckingChangeRoleConsumer(ILogger<AccountCheckingChangeRoleConsumer> logger, IMemoryCache cache, IValidator<LeadShortExchangeModel> validator)
     {
         _logger = logger;
         _cache = cache;
+        _validator = validator;
     }
 
     public Task Consume(ConsumeContext<LeadShortExchangeModel[]> context)
     {
+        foreach (var entity in context.Message)
+            _validator.ValidateAndThrow(entity);
+
         _logger.LogInformation("Change role Leads");
         foreach (var lead in context.Message)
         {

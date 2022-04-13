@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Marvelous.Contracts.RequestModels;
 
-namespace Auth.BusinessLayer.Validation;
+namespace Auth.BusinessLayer.Validators;
 
 public class AuthRequestModelValidator : AbstractValidator<AuthRequestModel>
 {

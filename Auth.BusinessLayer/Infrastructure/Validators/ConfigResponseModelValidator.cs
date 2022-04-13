@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Marvelous.Contracts.ResponseModels;
 
-namespace Auth.BusinessLayer.Validation;
+namespace Auth.BusinessLayer.Validators;
 
 public class ConfigResponseModelValidator : AbstractValidator<ConfigResponseModel>
 {

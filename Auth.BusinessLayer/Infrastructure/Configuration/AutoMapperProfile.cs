@@ -2,7 +2,7 @@
 using AutoMapper;
 using Marvelous.Contracts.ExchangeModels;
 
-namespace Auth.API.Configuration;
+namespace Auth.BusinessLayer.Configuration;
 
 public class AutoMapperProfile : Profile
 {

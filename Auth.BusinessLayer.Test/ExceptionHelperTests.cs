@@ -7,10 +7,15 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-public class ExceptionHelperTests
+public class ExceptionHelperTests : LoggerVerifyHelper
 {
-    private Mock<ILogger<ExceptionsHelper>> _logger;
+
+    #region SetUp
+
+    #pragma warning disable CS8618
     private IExceptionsHelper _helper;
+    private Mock<ILogger<ExceptionsHelper>> _logger;
+    #pragma warning restore CS8618
 
     [SetUp]
     public void SetUp()
@@ -18,6 +23,10 @@ public class ExceptionHelperTests
         _logger = new Mock<ILogger<ExceptionsHelper>>();
         _helper = new ExceptionsHelper(_logger.Object);
     }
+
+    #endregion
+
+    #region ExceptionHelper
 
     [Test]
     public void ThrowIfEmailNotFoundTest()
@@ -35,7 +44,7 @@ public class ExceptionHelperTests
     {
         //given
         var email = "test@example.com";
-        var lead = new LeadAuthModel { HashPassword = default, Id = default, Role = default };
+        var lead = new LeadAuthModel();
         var expected = $"Entity with e-mail = {email} not found";
 
         //when
@@ -43,7 +52,7 @@ public class ExceptionHelperTests
 
         //then
         Assert.AreEqual(expected, actual);
-        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
+        Verify(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -70,6 +79,9 @@ public class ExceptionHelperTests
 
         //then
         Assert.AreEqual(expected, actual);
-        LoggerVerifyHelper.Verify(_logger, LogLevel.Error, 1);
+        Verify(_logger, LogLevel.Error, 1);
     }
+
+    #endregion
+
 }

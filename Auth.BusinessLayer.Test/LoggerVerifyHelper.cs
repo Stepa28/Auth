@@ -5,9 +5,9 @@ using static Moq.It;
 
 namespace Auth.BusinessLayer.Test;
 
-internal static class LoggerVerifyHelper
+public abstract class LoggerVerifyHelper
 {
-    internal static void Verify<T>(Mock<ILogger<T>> logger, LogLevel level, int times)
+    protected static void Verify<T>(Mock<ILogger<T>> logger, LogLevel level, int times)
     {
         logger.Verify(v => v.Log(level,
                 IsAny<EventId>(),

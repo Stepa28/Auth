@@ -47,10 +47,8 @@ public static class InitializeMicroserviceModels
     private static void OnlyConfigMicroservices(IDictionary<Microservice, MicroserviceModel> microservices, params Microservice[] services)
     {
         foreach (var service in services)
-        {
             microservices.Add(service,
                 new MicroserviceModel(Microservice.MarvelousConfigs.ToString(), service, Microservice.MarvelousFrontendUndefined));
-        }
     }
 
     private static string StringJoinMicroservices(params Microservice[] services)

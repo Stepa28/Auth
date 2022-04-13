@@ -3,7 +3,7 @@ using Auth.BusinessLayer.Consumer;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
-using Auth.BusinessLayer.Validation;
+using Auth.BusinessLayer.Validators;
 using FluentValidation.AspNetCore;
 using Marvelous.Contracts.ExchangeModels;
 using Marvelous.Contracts.ResponseModels;
@@ -29,6 +29,7 @@ public static class BuilderServicesExtensions
         services.AddSingleton<IExceptionsHelper, ExceptionsHelper>();
         services.AddTransient<IInitializationLeads, InitializationLeads>();
         services.AddTransient<IInitializationConfigs, InitializationConfigs>();
+        services.AddTransient<IAdvancedController, AdvancedController>();
     }
 
     public static void AddCustomAuth(this IServiceCollection services, string secretKey)
@@ -142,6 +143,8 @@ public static class BuilderServicesExtensions
             fv.RegisterValidatorsFromAssemblyContaining<AuthRequestModelValidator>(lifetime: ServiceLifetime.Singleton);
             //Отключение валидации с помощью DataAnnotations
             fv.DisableDataAnnotationsValidation = true;
+            //Включение неявной проверки моделей коллекционного типа (не работает :) )
+            //fv.ImplicitlyValidateRootCollectionElements = true;
         });
         //Отключение стандартного валидатора
         services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });

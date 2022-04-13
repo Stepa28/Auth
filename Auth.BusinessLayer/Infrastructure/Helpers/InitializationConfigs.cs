@@ -28,11 +28,6 @@ public class InitializationConfigs : IInitializationConfigs
 
     public void InitializeConfigs()
     {
-        _logger.LogInformation("Initialize from default config");
-        _config["BaseAddress"] = "80.78.240.16";
-        _config[$"{Microservice.MarvelousCrm}Url"] = "https://piter-education.ru:5050";
-        _config[$"{Microservice.MarvelousReporting}Url"] = "https://piter-education.ru:6010";
-
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
 
         try
@@ -44,9 +39,7 @@ public class InitializationConfigs : IInitializationConfigs
                 token).Result;
 
             foreach (var config in response.Data!)
-            {
                 _config[config.Key] = config.Value;
-            }
             _logger.LogInformation($"Initialize from {Microservice.MarvelousConfigs} service: completed successfully");
         }
         catch (Exception ex)

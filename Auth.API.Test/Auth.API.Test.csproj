@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Auth.API\Auth.API.csproj"/>
+        <ProjectReference Include="..\Auth.BusinessLayer.Test\Auth.BusinessLayer.Test.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.Test.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0"/>
+    </ItemGroup>
+
+</Project>

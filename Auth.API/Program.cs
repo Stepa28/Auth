@@ -1,5 +1,6 @@
 using Auth.API.Extensions;
 using Auth.API.Infrastructure;
+using Auth.BusinessLayer.Configuration;
 using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
 
@@ -26,7 +27,7 @@ builder.Services.RegisterLogger(config);
 builder.Services.AddMemoryCache();
 builder.Services.AddMassTransit();
 builder.Services.AddCustomAuth(secretKey);
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddFluentValidation();
 
 builder.Services.AddHostedService<HostedService>();

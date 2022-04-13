@@ -13,11 +13,11 @@ public class PasswordHashTests
     public void HashPasswordTest(string passwordForTest)
     {
         //given
-        string password = passwordForTest;
+        var password = passwordForTest;
 
         //when
-        string actual = PasswordHash.HashPassword(password);
-        string expected = CalcHash(password);
+        var actual = PasswordHash.HashPassword(password);
+        var expected = CalcHash(password);
 
         //then
         Assert.AreEqual(actual.Split(":")[0], expected.Split(":")[0]);
@@ -32,10 +32,10 @@ public class PasswordHashTests
     public void ValidatePasswordTest(string currentPassword, bool expected)
     {
         //given
-        string validPassword = "password8749";
+        var validPassword = "password8749";
 
         //when
-        bool actual = PasswordHash.ValidatePassword(validPassword, CalcHash(currentPassword));
+        var actual = PasswordHash.ValidatePassword(validPassword, CalcHash(currentPassword));
 
         //then
         Assert.AreEqual(actual, expected);

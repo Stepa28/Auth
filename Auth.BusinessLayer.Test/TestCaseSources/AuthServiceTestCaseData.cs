@@ -10,7 +10,7 @@ internal class AuthServiceTestCaseData
 {
     internal static IEnumerable<TestCaseData> GetTestCaseDataForGetTokenForFrontTest()
     {
-        var email = "test@example.com";
+        const string email = "test@example.com";
 
         yield return new TestCaseData(email,
             Microservice.MarvelousCrm,
