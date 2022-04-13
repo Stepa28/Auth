@@ -1,6 +1,6 @@
 ﻿namespace Auth.BusinessLayer.Exceptions;
 
-public class IncorrectPasswordException : BadRequestException
+public class IncorrectPasswordException : Exception
 {
     public IncorrectPasswordException(string message) : base(message) {}
 }

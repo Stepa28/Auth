@@ -39,6 +39,7 @@ public class AuthorizationsController : AdvancedController
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ExceptionResponseModel), StatusCodes.Status409Conflict)]
     [SwaggerOperation("Get a token for front microservices (Only marvelous microservices)")]
     public ActionResult<string> Login([FromBody] AuthRequestModel auth)
     {

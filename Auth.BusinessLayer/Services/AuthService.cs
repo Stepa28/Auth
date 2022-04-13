@@ -17,10 +17,10 @@ namespace Auth.BusinessLayer.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
-    private readonly IExceptionsHelper _exceptionsHelper;
     private readonly IConfiguration _config;
+    private readonly IExceptionsHelper _exceptionsHelper;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IConfiguration config)
     {
@@ -29,6 +29,9 @@ public class AuthService : IAuthService
         _exceptionsHelper = exceptionsHelper;
         _config = config;
     }
+
+    private Dictionary<Microservice, MicroserviceModel> Microservices =>
+        _cache.GetOrCreate(nameof(Microservice), _ => InitializeMicroserviceModels.InitializeMicroservices());
 
     public string GetTokenForFront(string email, string pass, Microservice service)
     {
@@ -134,7 +137,4 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
-
-    private Dictionary<Microservice, MicroserviceModel> Microservices =>
-        _cache.GetOrCreate(nameof(Microservice), _ => InitializeMicroserviceModels.InitializeMicroservices());
 }

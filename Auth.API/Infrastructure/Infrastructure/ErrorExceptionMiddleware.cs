@@ -49,6 +49,10 @@ public class ErrorExceptionMiddleware
         {
             await ConstructResponse(context, HttpStatusCode.UnprocessableEntity, ex.Message);
         }
+        catch (IncorrectPasswordException ex)
+        {
+            await ConstructResponse(context, HttpStatusCode.Conflict, ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.Error(ex);
