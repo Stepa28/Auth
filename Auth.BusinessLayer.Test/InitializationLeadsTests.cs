@@ -63,13 +63,13 @@ public class InitializationLeadsTests : LoggerVerifyHelper
         //given
         _config[$"{Microservice.MarvelousCrm}Url"] = addressCrm;
         _authService.Setup(s => s.GetTokenForMicroservice(IsAny<Microservice>())).Returns(token);
-        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).ReturnsAsync(response);
+        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).ReturnsAsync(response);
 
         //when
         await _initializationLeads.InitializeLeads();
 
         //then
-        _requestHelper.Verify(v => v.SendRequest(addressCrm, CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token), Times.Once);
+        _requestHelper.Verify(v => v.SendRequest(addressCrm + CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token), Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
         _producer.Verify(v => v.NotifyErrorByEmail(IsAny<string>()), Times.Never);
         Assert.AreEqual(_cache.Get<LeadAuthModel>(listLeads[0].Email), _mapper.Map<LeadAuthModel>(listLeads[0]));
@@ -86,18 +86,18 @@ public class InitializationLeadsTests : LoggerVerifyHelper
         //given
         _config[$"{Microservice.MarvelousCrm}Url"] = addressCrm;
         _config[$"{Microservice.MarvelousReporting}Url"] = addressRep;
+        var urlCrm = addressCrm + CrmEndpoints.LeadApi + CrmEndpoints.Auth;
+        var urlRep = addressRep + ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads;
         _authService.Setup(s => s.GetTokenForMicroservice(IsAny<Microservice>())).Returns(token);
-        _requestHelper.Setup(s => s.SendRequest(addressCrm, IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).Throws<Exception>();
-        _requestHelper.Setup(s => s.SendRequest(addressRep, IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).ReturnsAsync(response);
+        _requestHelper.Setup(s => s.SendRequest(urlCrm, IsAny<Microservice>(), IsAny<string>())).Throws<Exception>();
+        _requestHelper.Setup(s => s.SendRequest(urlRep, IsAny<Microservice>(), IsAny<string>())).ReturnsAsync(response);
 
         //when
         await _initializationLeads.InitializeLeads();
 
         //then
-        _requestHelper.Verify(v => v.SendRequest(addressCrm, CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token), Times.Once);
-        _requestHelper.Verify(
-            v => v.SendRequest(addressRep, ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token),
-            Times.Once);
+        _requestHelper.Verify(v => v.SendRequest(urlCrm, Microservice.MarvelousCrm, token), Times.Once);
+        _requestHelper.Verify(v => v.SendRequest(urlRep, Microservice.MarvelousReporting, token), Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
         _producer.Verify(v => v.NotifyErrorByEmail(IsAny<string>()), Times.Never);
         Assert.AreEqual(_cache.Get<LeadAuthModel>(listLeads[0].Email), _mapper.Map<LeadAuthModel>(listLeads[0]));
@@ -117,15 +117,15 @@ public class InitializationLeadsTests : LoggerVerifyHelper
         _config[$"{Microservice.MarvelousCrm}Url"] = addressCrm;
         _config[$"{Microservice.MarvelousReporting}Url"] = addressRep;
         _authService.Setup(s => s.GetTokenForMicroservice(IsAny<Microservice>())).Returns(token);
-        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).Throws<Exception>();
+        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).Throws<Exception>();
 
         //when
         await _initializationLeads.InitializeLeads();
 
         //then
-        _requestHelper.Verify(v => v.SendRequest(addressCrm, CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token), Times.Once);
+        _requestHelper.Verify(v => v.SendRequest(addressCrm + CrmEndpoints.LeadApi + CrmEndpoints.Auth, Microservice.MarvelousCrm, token), Times.Once);
         _requestHelper.Verify(
-            v => v.SendRequest(addressRep, ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token),
+            v => v.SendRequest(addressRep + ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token),
             Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
         _producer.Verify(v => v.NotifyErrorByEmail($"Initialization leads with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed"),

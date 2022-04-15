@@ -10,19 +10,20 @@ namespace Auth.BusinessLayer.Helpers;
 public class RequestHelper<T> : IRequestHelper<T> where T : class, new()
 {
     private readonly IValidator<T> _validator;
+    private readonly IRestClient _client;
 
-    public RequestHelper(IValidator<T> validator)
+    public RequestHelper(IValidator<T> validator, IRestClient client)
     {
         _validator = validator;
+        _client = client;
     }
 
-    public async Task<RestResponse<IEnumerable<T>>> SendRequest(string url, string path, Microservice service, string jwtToken)
+    public async Task<RestResponse<IEnumerable<T>>> SendRequest(string url, Microservice service, string jwtToken)
     {
-        var request = new RestRequest(path);
-        var client = new RestClient(url);
-        client.Authenticator = new JwtAuthenticator(jwtToken);
-        client.AddDefaultHeader(nameof(Microservice), Microservice.MarvelousAuth.ToString());
-        var response = await client.ExecuteAsync<IEnumerable<T>>(request);
+        var request = new RestRequest(url);
+        _client.Authenticator = new JwtAuthenticator(jwtToken);
+        _client.AddMicroservice(Microservice.MarvelousAuth);
+        var response = await _client.ExecuteAsync<IEnumerable<T>>(request);
         CheckTransactionError(response, service);
         return response;
     }

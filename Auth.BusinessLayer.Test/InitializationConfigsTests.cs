@@ -52,13 +52,13 @@ public class InitializationConfigsTests : LoggerVerifyHelper
         //given
         _config[$"{Microservice.MarvelousConfigs}Url"] = address;
         _authService.Setup(s => s.GetTokenForMicroservice(IsAny<Microservice>())).Returns(token);
-        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).ReturnsAsync(responseData);
+        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).ReturnsAsync(responseData);
 
         //when
         _initializationConfigs.InitializeConfigs();
 
         //then
-        _requestHelper.Verify(v => v.SendRequest(address, ConfigsEndpoints.Configs, Microservice.MarvelousConfigs, token), Times.Once);
+        _requestHelper.Verify(v => v.SendRequest(address + ConfigsEndpoints.Configs, Microservice.MarvelousConfigs, token), Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
         _producer.Verify(v => v.NotifyErrorByEmail(IsAny<string>()), Times.Never);
         Assert.AreEqual(_config["BaseAddress"], listConfigs[0].Value);
@@ -74,13 +74,13 @@ public class InitializationConfigsTests : LoggerVerifyHelper
         //given
         _config[$"{Microservice.MarvelousConfigs}Url"] = address;
         _authService.Setup(s => s.GetTokenForMicroservice(IsAny<Microservice>())).Returns(token);
-        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).Throws<Exception>();
+        _requestHelper.Setup(s => s.SendRequest(IsAny<string>(), IsAny<Microservice>(), IsAny<string>())).Throws<Exception>();
 
         //when
         _initializationConfigs.InitializeConfigs();
 
         //then
-        _requestHelper.Verify(v => v.SendRequest(address, ConfigsEndpoints.Configs, Microservice.MarvelousConfigs, token), Times.Once);
+        _requestHelper.Verify(v => v.SendRequest(address + ConfigsEndpoints.Configs, Microservice.MarvelousConfigs, token), Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
         _producer.Verify(v => v.NotifyErrorByEmail(IsAny<string>()), Times.Once);
         Assert.AreEqual(_config["BaseAddress"], "80.78.240.16");

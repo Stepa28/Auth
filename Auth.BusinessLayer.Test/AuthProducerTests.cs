@@ -10,23 +10,8 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-//TODO спиздить
 public class AuthProducerTests : LoggerVerifyHelper
 {
-
-    [Test]
-    public async Task NotifyErrorByEmail_ValidRequestReceived_ShouldPublishMassage()
-    {
-        //given
-        var massage = "Test message";
-
-        //when
-        await _producer.NotifyErrorByEmail(massage);
-
-        //then
-        _bus.Verify(v => v.Publish(It.IsAny<EmailErrorMessage>(), new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token), Times.Never);
-        Verify(_logger, LogLevel.Information, 2);
-    }
 
     #region SetUp
 
@@ -47,4 +32,18 @@ public class AuthProducerTests : LoggerVerifyHelper
 
     #endregion
 
+
+    [Test]
+    public async Task NotifyErrorByEmail_ValidRequestReceived_ShouldPublishMassage()
+    {
+        //given
+        var massage = "Test message";
+
+        //when
+        await _producer.NotifyErrorByEmail(massage);
+
+        //then
+        _bus.Verify(v => v.Publish(It.IsAny<EmailErrorMessage>(), new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token), Times.Never);
+        Verify(_logger, LogLevel.Information, 2);
+    }
 }

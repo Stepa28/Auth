@@ -33,8 +33,7 @@ public class InitializationConfigs : IInitializationConfigs
         try
         {
             _logger.LogInformation($"Attempt to initialize configs from {Microservice.MarvelousConfigs} service");
-            var response = _requestHelper.SendRequest(_config[$"{Microservice.MarvelousConfigs}Url"],
-                ConfigsEndpoints.Configs,
+            var response = _requestHelper.SendRequest($"{_config[$"{Microservice.MarvelousConfigs}Url"]}{ConfigsEndpoints.Configs}",
                 Microservice.MarvelousConfigs,
                 token).Result;
 
