@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
-using RestSharp;
 
 namespace Auth.API.Extensions;
 
@@ -28,7 +27,7 @@ public static class BuilderServicesExtensions
         services.AddSingleton<IRequestHelper<LeadAuthExchangeModel>, RequestHelper<LeadAuthExchangeModel>>();
         services.AddSingleton<IAuthProducer, AuthProducer>();
         services.AddSingleton<IExceptionsHelper, ExceptionsHelper>();
-        services.AddSingleton<RestClient>();
+        services.AddTransient<IRestClient, MarvelousRestClient>();
         services.AddTransient<IInitializationLeads, InitializationLeads>();
         services.AddTransient<IInitializationConfigs, InitializationConfigs>();
         services.AddTransient<IAdvancedController, AdvancedController>();

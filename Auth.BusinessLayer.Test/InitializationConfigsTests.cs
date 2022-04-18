@@ -16,7 +16,7 @@ using static Moq.It;
 
 namespace Auth.BusinessLayer.Test;
 
-public class InitializationConfigsTests : LoggerVerifyHelper
+public class InitializationConfigsTests : VerifyHelper
 {
 
     #region SetUp
@@ -64,7 +64,7 @@ public class InitializationConfigsTests : LoggerVerifyHelper
         Assert.AreEqual(_config["BaseAddress"], listConfigs[0].Value);
         Assert.AreEqual(_config["Address"], listConfigs[1].Value);
         Assert.AreEqual(_config[$"{Microservice.MarvelousCrm}Url"], "https://piter-education.ru:5050");
-        Verify(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Information, 2);
     }
 
     [TestCaseSource(typeof(InitializationConfigsTestCaseData),
@@ -86,8 +86,8 @@ public class InitializationConfigsTests : LoggerVerifyHelper
         Assert.AreEqual(_config["BaseAddress"], "80.78.240.16");
         Assert.IsNull(_config["Address"]);
         Assert.AreEqual(_config[$"{Microservice.MarvelousCrm}Url"], "https://piter-education.ru:5050");
-        Verify(_logger, LogLevel.Information, 1);
-        Verify(_logger, LogLevel.Warning, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Warning, 1);
     }
 
     #endregion

@@ -21,7 +21,7 @@ using static Moq.It;
 
 namespace Auth.BusinessLayer.Test;
 
-public class AuthServiceTests : LoggerVerifyHelper
+public class AuthServiceTests : VerifyHelper
 {
 
     #region SetUp
@@ -69,7 +69,7 @@ public class AuthServiceTests : LoggerVerifyHelper
         Assert.AreEqual(expected.Split('.')[0], actual.Split('.')[0]);
         Assert.AreEqual(expected.Split('.')[1].Length, actual.Split('.')[1].Length);
         Assert.AreEqual(expected.Split('.')[2].Length, actual.Split('.')[2].Length);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     #endregion
@@ -115,7 +115,7 @@ public class AuthServiceTests : LoggerVerifyHelper
         Assert.AreEqual(expected.Split('.')[0], actual.Split('.')[0]);
         Assert.AreEqual(expected.Split('.')[1].Length, actual.Split('.')[1].Length);
         Assert.AreEqual(expected.Split('.')[2].Length, actual.Split('.')[2].Length);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -129,7 +129,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -145,7 +145,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -161,7 +161,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     #endregion
@@ -178,7 +178,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.IsTrue(actual);
-        Verify(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Information, 2);
     }
 
     [Test]
@@ -193,8 +193,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
@@ -211,8 +211,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion
@@ -229,7 +229,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.IsTrue(actual);
-        Verify(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Information, 2);
     }
 
     [Test]
@@ -244,8 +244,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -261,8 +261,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion
@@ -279,7 +279,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.IsTrue(actual);
-        Verify(_logger, LogLevel.Information, 3);
+        VerifyLogger(_logger, LogLevel.Information, 3);
     }
 
     [Test]
@@ -295,8 +295,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 2);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousAuth)]
@@ -309,7 +309,7 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.IsTrue(actual);
-        Verify(_logger, LogLevel.Information, 3);
+        VerifyLogger(_logger, LogLevel.Information, 3);
     }
 
     [Test]
@@ -324,8 +324,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 2);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
@@ -342,8 +342,8 @@ public class AuthServiceTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 2);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion

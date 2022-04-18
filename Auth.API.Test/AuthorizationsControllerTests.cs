@@ -20,7 +20,7 @@ using static Moq.It;
 
 namespace Auth.API.Test;
 
-public class AuthorizationsControllerTests : LoggerVerifyHelper
+public class AuthorizationsControllerTests : VerifyHelper
 {
 
     #region SetUp
@@ -33,6 +33,7 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
     private Mock<ILogger<AuthorizationsController>> _logger;
     private IValidator<AuthRequestModel> _validator;
     #pragma warning restore CS8618
+    private const Microservice Crm = Microservice.MarvelousCrm;
 
     [SetUp]
     public void Setup()
@@ -56,20 +57,19 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         //given
         _cache.Set("Initialization task lead", Task.CompletedTask);
         var auth = new AuthRequestModel { Email = "test@example.com", Password = "testPassword" };
-        var crm = Microservice.MarvelousCrm;
         var expected = "Test token";
-        _advancedController.Setup(s => s.Service).Returns(crm);
+        _advancedController.Setup(s => s.Service).Returns(Crm);
         _authService.Setup(s => s.GetTokenForFront(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Returns(expected);
 
         //when
         var actual = _controller.Login(auth).Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, crm), Times.Once);
+        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, Crm), Times.Once);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, LogLevel.Information, 2);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 2);
     }
 
     [Test]
@@ -85,9 +85,9 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.Login(auth))!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -96,19 +96,18 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         //given
         _cache.Set("Initialization task lead", Task.CompletedTask);
         var auth = new AuthRequestModel { Email = "test@example.com", Password = "testPassword" };
-        var crm = Microservice.MarvelousCrm;
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(crm);
+        _advancedController.Setup(s => s.Service).Returns(Crm);
         _authService.Setup(s => s.GetTokenForFront(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new NotFoundException(expected));
 
         //when
         var actual = Assert.Throws<NotFoundException>(() => _controller.Login(auth))!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, crm), Times.Once);
+        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, Crm), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -117,19 +116,18 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         //given
         _cache.Set("Initialization task lead", Task.CompletedTask);
         var auth = new AuthRequestModel { Email = "test@example.com", Password = "testPassword" };
-        var crm = Microservice.MarvelousCrm;
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(crm);
+        _advancedController.Setup(s => s.Service).Returns(Crm);
         _authService.Setup(s => s.GetTokenForFront(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new IncorrectPasswordException(expected));
 
         //when
         var actual = Assert.Throws<IncorrectPasswordException>(() => _controller.Login(auth))!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, crm), Times.Once);
+        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, Crm), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -138,19 +136,18 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         //given
         _cache.Set("Initialization task lead", Task.CompletedTask);
         var auth = new AuthRequestModel { Email = "test@example.com", Password = "testPassword" };
-        var crm = Microservice.MarvelousCrm;
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(crm);
+        _advancedController.Setup(s => s.Service).Returns(Crm);
         _authService.Setup(s => s.GetTokenForFront(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new ServiceUnavailableException(expected));
 
         //when
         var actual = Assert.Throws<ServiceUnavailableException>(() => _controller.Login(auth))!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, crm), Times.Once);
+        _authService.Verify(v => v.GetTokenForFront(auth.Email, auth.Password, Crm), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -164,7 +161,8 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyAdvancedController(_advancedController, 0, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -179,7 +177,8 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyAdvancedController(_advancedController, 0, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion
@@ -190,20 +189,19 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
     public void GetTokenForMicroservice_ValidRequestReceived_Should200OkToken()
     {
         //given
-        var crm = Microservice.MarvelousCrm;
         var expected = "Test token";
-        _advancedController.Setup(s => s.Service).Returns(crm);
+        _advancedController.Setup(s => s.Service).Returns(Crm);
         _authService.Setup(s => s.GetTokenForMicroservice(IsAny<Microservice>())).Returns(expected);
 
         //when
         var actual = _controller.GetTokenForMicroservice().Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _authService.Verify(v => v.GetTokenForMicroservice(crm), Times.Once);
+        _authService.Verify(v => v.GetTokenForMicroservice(Crm), Times.Once);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -217,9 +215,9 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.GetTokenForMicroservice())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     #endregion
@@ -241,14 +239,11 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = _controller.CheckTokenAmongMicroservices().Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Exactly(2));
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Once);
         _authService.Verify(v => v.CheckValidTokenAmongMicroservices(issuer, audience, service), Times.Once);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 2, 1, 1);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase("MarvelousAuth")]
@@ -263,13 +258,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = _controller.CheckTokenAmongMicroservices().Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Never);
-        _advancedController.Verify(v => v.Service, Times.Never);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyAdvancedController(_advancedController, 0, 1, 0, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [TestCase("MarvelousCrm")]
@@ -284,12 +276,9 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.CheckTokenAmongMicroservices())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Issuer, Times.Exactly(2));
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
-        _advancedController.Verify(v => v.Audience, Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 2, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -307,13 +296,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.CheckTokenAmongMicroservices())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Exactly(2));
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenAmongMicroservices(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 2, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -327,9 +313,9 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<AuthenticationException>(() => _controller.CheckTokenAmongMicroservices())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Issuer, Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 0, 1, 0, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -347,13 +333,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<AuthenticationException>(() => _controller.CheckTokenAmongMicroservices())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Exactly(2));
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenAmongMicroservices(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 2, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     #endregion
@@ -375,14 +358,11 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = _controller.CheckTokenFrontend().Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Once);
         _authService.Verify(v => v.CheckValidTokenFrontend(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 1);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -396,13 +376,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.CheckTokenFrontend())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()), Times.Never);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -419,13 +396,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.CheckTokenFrontend())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenFrontend(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -439,13 +413,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<AuthenticationException>(() => _controller.CheckTokenFrontend())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Never);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Never);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()), Times.Never);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 0, 1, 0, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -462,13 +433,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<AuthenticationException>(() => _controller.CheckTokenFrontend())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenFrontend(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -487,13 +455,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.CheckTokenFrontend())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Exactly(2));
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Once);
         _authService.Verify(v => v.CheckValidTokenFrontend(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 2, 1, 1, 1);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     #endregion
@@ -515,14 +480,11 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = _controller.DoubleCheckToken().Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Once);
         _authService.Verify(v => v.CheckDoubleValidToken(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 1);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -536,13 +498,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.DoubleCheckToken())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckDoubleValidToken(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()), Times.Never);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -559,13 +518,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.DoubleCheckToken())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckDoubleValidToken(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -580,13 +536,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<AuthenticationException>(() => _controller.DoubleCheckToken())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Never);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Never);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()), Times.Never);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 0, 1, 0, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousFrontendCrm)]
@@ -603,13 +556,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<AuthenticationException>(() => _controller.DoubleCheckToken())!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
-        _advancedController.Verify(v => v.Issuer, Times.Once);
-        _advancedController.Verify(v => v.Audience, Times.Once);
-        _advancedController.Verify(v => v.Identity, Times.Never);
         _authService.Verify(v => v.CheckDoubleValidToken(service.ToString(), audience.ToString(), service), Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 1, 1, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     #endregion
@@ -629,11 +579,11 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = _controller.GetHashingString(password).Result as OkObjectResult;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
         _authService.Verify(v => v.GetHashPassword(password), Times.Once);
         Assert.AreEqual(StatusCodes.Status200OK, actual!.StatusCode);
         Assert.AreEqual(expected, actual.Value);
-        Verify(_logger, LogLevel.Information, 2);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 2);
     }
 
     [Test]
@@ -648,9 +598,9 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<ForbiddenException>(() => _controller.GetHashingString(password))!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [TestCase(Microservice.MarvelousCrm)]
@@ -664,11 +614,10 @@ public class AuthorizationsControllerTests : LoggerVerifyHelper
         var actual = Assert.Throws<BadRequestException>(() => _controller.GetHashingString(null))!.Message;
 
         //then
-        _advancedController.Verify(v => v.Service, Times.Once);
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Information, 1);
-        Verify(_logger, LogLevel.Error, 1);
-
+        VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
+        VerifyLogger(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion

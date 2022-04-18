@@ -14,7 +14,7 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-public class CrmAddOrChangeLeadConsumerTests : LoggerVerifyHelper
+public class CrmAddOrChangeLeadConsumerTests : VerifyHelper
 {
 
     #region SetUp
@@ -54,7 +54,7 @@ public class CrmAddOrChangeLeadConsumerTests : LoggerVerifyHelper
 
         //then
         Assert.NotNull(_cache.Get<LeadAuthModel>(lead.Email));
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class CrmAddOrChangeLeadConsumerTests : LoggerVerifyHelper
         Assert.IsNull(_cache.Get<LeadAuthModel>(lead.Email).HashPassword);
         Assert.IsTrue(_cache.Get<LeadAuthModel>(lead.Email).Id == default);
         Assert.IsTrue(_cache.Get<LeadAuthModel>(lead.Email).Role == default);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class CrmAddOrChangeLeadConsumerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, It.IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, It.IsAny<LogLevel>(), 0);
     }
 
     #endregion

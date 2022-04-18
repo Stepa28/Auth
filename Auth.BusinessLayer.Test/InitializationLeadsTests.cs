@@ -21,7 +21,7 @@ using static Moq.It;
 
 namespace Auth.BusinessLayer.Test;
 
-public class InitializationLeadsTests : LoggerVerifyHelper
+public class InitializationLeadsTests : VerifyHelper
 {
 
     #region SetUp
@@ -75,7 +75,7 @@ public class InitializationLeadsTests : LoggerVerifyHelper
         Assert.AreEqual(_cache.Get<LeadAuthModel>(listLeads[0].Email), _mapper.Map<LeadAuthModel>(listLeads[0]));
         Assert.AreEqual(_cache.Get<LeadAuthModel>(listLeads[1].Email), _mapper.Map<LeadAuthModel>(listLeads[1]));
         Assert.IsTrue(_cache.Get<bool>("Initialization leads"));
-        Verify(_logger, LogLevel.Information, 3);
+        VerifyLogger(_logger, LogLevel.Information, 3);
     }
 
     [TestCaseSource(typeof(InitializationLeadsTestCaseData),
@@ -103,8 +103,8 @@ public class InitializationLeadsTests : LoggerVerifyHelper
         Assert.AreEqual(_cache.Get<LeadAuthModel>(listLeads[0].Email), _mapper.Map<LeadAuthModel>(listLeads[0]));
         Assert.AreEqual(_cache.Get<LeadAuthModel>(listLeads[1].Email), _mapper.Map<LeadAuthModel>(listLeads[1]));
         Assert.IsTrue(_cache.Get<bool>("Initialization leads"));
-        Verify(_logger, LogLevel.Information, 4);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Information, 4);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [TestCaseSource(typeof(InitializationLeadsTestCaseData),
@@ -131,9 +131,9 @@ public class InitializationLeadsTests : LoggerVerifyHelper
         _producer.Verify(v => v.NotifyErrorByEmail($"Initialization leads with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed"),
             Times.Once);
         Assert.IsFalse(_cache.Get<bool>("Initialization leads"));
-        Verify(_logger, LogLevel.Information, 2);
-        Verify(_logger, LogLevel.Error, 2);
-        Verify(_logger, LogLevel.Warning, 1);
+        VerifyLogger(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Error, 2);
+        VerifyLogger(_logger, LogLevel.Warning, 1);
     }
 
     #endregion

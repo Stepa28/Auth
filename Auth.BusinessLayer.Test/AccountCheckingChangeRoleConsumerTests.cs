@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-public class AccountCheckingChangeRoleConsumerTests : LoggerVerifyHelper
+public class AccountCheckingChangeRoleConsumerTests : VerifyHelper
 {
 
     #region SetUp
@@ -63,7 +63,7 @@ public class AccountCheckingChangeRoleConsumerTests : LoggerVerifyHelper
         Assert.AreEqual(_cache.Get<LeadAuthModel>("test4@example.com").Role, Role.Vip);
         Assert.IsTrue(_cache.Get<LeadAuthModel>(models[1].Email).Id == default);
         Assert.IsTrue(_cache.Get<LeadAuthModel>(models[1].Email).Role == default);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class AccountCheckingChangeRoleConsumerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, It.IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, It.IsAny<LogLevel>(), 0);
     }
 
     #endregion

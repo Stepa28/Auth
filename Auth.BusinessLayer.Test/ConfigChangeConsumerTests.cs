@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-public class ConfigChangeConsumerTests : LoggerVerifyHelper
+public class ConfigChangeConsumerTests : VerifyHelper
 {
 
     #region SetUp
@@ -50,7 +50,7 @@ public class ConfigChangeConsumerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(_config[cfg.Key], cfg.Value);
-        Verify(_logger, LogLevel.Information, 1);
+        VerifyLogger(_logger, LogLevel.Information, 1);
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class ConfigChangeConsumerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, It.IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, It.IsAny<LogLevel>(), 0);
     }
 
     #endregion

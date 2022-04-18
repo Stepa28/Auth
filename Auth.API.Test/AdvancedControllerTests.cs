@@ -19,7 +19,7 @@ using static Moq.It;
 
 namespace Auth.API.Test;
 
-public class AdvancedControllerTests : LoggerVerifyHelper
+public class AdvancedControllerTests : VerifyHelper
 {
 
     #region SetUp
@@ -65,7 +65,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -103,7 +103,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion
@@ -144,7 +144,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected.ToString(), actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -163,7 +163,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion
@@ -201,7 +201,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected.ToString(), actual);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -220,7 +220,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -239,7 +239,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion
@@ -261,7 +261,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
         Assert.AreEqual(expected.IssuerMicroservice, actual);
         Assert.IsNull(expected.Id);
         Assert.IsNull(expected.Role);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -284,7 +284,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
         Assert.AreEqual(expected.IssuerMicroservice, actual.IssuerMicroservice);
         Assert.AreEqual(expected.Id, actual.Id);
         Assert.AreEqual(expected.Role, actual.Role);
-        Verify(_logger, IsAny<LogLevel>(), 0);
+        VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
 
     [Test]
@@ -303,7 +303,7 @@ public class AdvancedControllerTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion

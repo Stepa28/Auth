@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-public class ExceptionHelperTests : LoggerVerifyHelper
+public class ExceptionHelperTests : VerifyHelper
 {
 
     #region SetUp
@@ -52,7 +52,7 @@ public class ExceptionHelperTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class ExceptionHelperTests : LoggerVerifyHelper
 
         //then
         Assert.AreEqual(expected, actual);
-        Verify(_logger, LogLevel.Error, 1);
+        VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
     #endregion

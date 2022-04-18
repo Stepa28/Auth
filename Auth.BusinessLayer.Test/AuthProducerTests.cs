@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace Auth.BusinessLayer.Test;
 
-public class AuthProducerTests : LoggerVerifyHelper
+public class AuthProducerTests : VerifyHelper
 {
 
     #region SetUp
@@ -44,6 +44,6 @@ public class AuthProducerTests : LoggerVerifyHelper
 
         //then
         _bus.Verify(v => v.Publish(It.IsAny<EmailErrorMessage>(), new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token), Times.Never);
-        Verify(_logger, LogLevel.Information, 2);
+        VerifyLogger(_logger, LogLevel.Information, 2);
     }
 }
