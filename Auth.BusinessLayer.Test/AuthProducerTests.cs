@@ -43,7 +43,7 @@ public class AuthProducerTests : VerifyHelper
         await _producer.NotifyErrorByEmail(massage);
 
         //then
-        _bus.Verify(v => v.Publish(It.IsAny<EmailErrorMessage>(), new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token), Times.Never);
+        _bus.Verify(v => v.Publish(It.IsAny<EmailErrorMessage>(), It.IsAny<CancellationToken>()), Times.Once);
         VerifyLogger(_logger, LogLevel.Information, 2);
     }
 }

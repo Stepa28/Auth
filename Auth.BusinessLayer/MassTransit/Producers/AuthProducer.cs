@@ -22,7 +22,7 @@ public class AuthProducer : IAuthProducer
 
         _logger.LogInformation("Attempt to report failed initialization");
 
-        await _bus.Publish<EmailErrorMessage>(new
+        await _bus.Publish(new EmailErrorMessage
             {
                 ServiceName = Microservice.MarvelousAuth.ToString(),
                 TextMessage = message
