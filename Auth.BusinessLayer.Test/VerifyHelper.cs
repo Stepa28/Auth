@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Auth.API.Extensions;
-using Auth.BusinessLayer.Helpers;
+using Marvelous.Contracts.Client;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ResponseModels;
 using Microsoft.Extensions.Logging;

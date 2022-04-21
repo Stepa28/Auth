@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Auth.BusinessLayer.Exceptions;
 using FluentValidation;
+using Marvelous.Contracts.Client;
 using Marvelous.Contracts.Enums;
 using RestSharp;
 using RestSharp.Authenticators;
@@ -16,13 +17,13 @@ public class RequestHelper<T> : IRequestHelper<T> where T : class, new()
     {
         _validator = validator;
         _client = client;
+        _client.AddMicroservice(Microservice.MarvelousAuth);
     }
 
     public async Task<RestResponse<IEnumerable<T>>> SendRequest(string url, Microservice service, string jwtToken)
     {
         var request = new RestRequest(url);
         _client.Authenticator = new JwtAuthenticator(jwtToken);
-        _client.AddMicroservice(Microservice.MarvelousAuth);
         var response = await _client.ExecuteAsync<IEnumerable<T>>(request);
         CheckTransactionError(response, service);
         return response;

@@ -5,6 +5,7 @@ using Auth.BusinessLayer.Producers;
 using Auth.BusinessLayer.Services;
 using Auth.BusinessLayer.Validators;
 using FluentValidation.AspNetCore;
+using Marvelous.Contracts.Client;
 using Marvelous.Contracts.ExchangeModels;
 using Marvelous.Contracts.ResponseModels;
 using MassTransit;

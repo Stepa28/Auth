@@ -7,6 +7,7 @@ using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Validators;
 using FluentValidation;
+using Marvelous.Contracts.Client;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ResponseModels;
 using Moq;
