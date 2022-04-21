@@ -5,12 +5,12 @@ using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
-const string _logDirectoryVariableName = "LOG_DIRECTORY";
-const string _secretKeyVariableName = "SUPER_SECRET_KYE";
-const string _configUrlVariableName = "CONFIGS_SERVICE_URL";
-var logDirectory = builder.Configuration.GetValue<string>(_logDirectoryVariableName);
-var secretKey = builder.Configuration.GetValue<string>(_secretKeyVariableName);
-var configUrl = builder.Configuration.GetValue<string>(_configUrlVariableName);
+const string logDirectoryVariableName = "LOG_DIRECTORY";
+const string secretKeyVariableName = "SUPER_SECRET_KYE";
+const string configUrlVariableName = "CONFIGS_SERVICE_URL";
+var logDirectory = builder.Configuration.GetValue<string>(logDirectoryVariableName);
+var secretKey = builder.Configuration.GetValue<string>(secretKeyVariableName);
+var configUrl = builder.Configuration.GetValue<string>(configUrlVariableName);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
