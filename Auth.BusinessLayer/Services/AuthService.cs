@@ -1,10 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
-using Auth.BusinessLayer.Configurations;
+using System.Text;
+using System.Text.RegularExpressions;
+using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Security;
+using Marvelous.Contracts.Enums;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,38 +17,124 @@ namespace Auth.BusinessLayer.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly ILogger<AuthService> _logger;
     private readonly IMemoryCache _cache;
+    private readonly IConfiguration _config;
+    private readonly IExceptionsHelper _exceptionsHelper;
+    private readonly ILogger<AuthService> _logger;
 
-
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IConfiguration config)
     {
         _logger = logger;
         _cache = memoryCache;
+        _exceptionsHelper = exceptionsHelper;
+        _config = config;
     }
 
-    public async Task<string> GetToken(string email, string pass)
-    {
-        var entity = _cache.Get<LeadAuthModel>(email);
-        ExceptionsHelper.ThrowIfEmailNotFound(email, entity);
-        ExceptionsHelper.ThrowIfPasswordIsIncorrected(pass, entity.HashPassword);
+    private Dictionary<Microservice, MicroserviceModel> Microservices =>
+        _cache.GetOrCreate(nameof(Microservice), _ => InitializeMicroserviceModels.InitializeMicroservices());
 
-        var claims = new List<Claim>
+    public string GetTokenForFront(string email, string pass, Microservice service)
+    {
+        if (!_cache.Get<bool>("Initialization leads"))
         {
-            new(ClaimTypes.Email, email), //TODO ??? нужен ли email в токене 
+            var ex = new ServiceUnavailableException("Microservice initialize leads was not completed");
+            _logger.LogError(ex, ex.Message);
+            throw ex;
+        }
+
+        var entity = _cache.Get<LeadAuthModel>(email);
+        _exceptionsHelper.ThrowIfEmailNotFound(email, entity);
+        _exceptionsHelper.ThrowIfPasswordIsIncorrected(pass, entity.HashPassword);
+
+        var claims = new Claim[]
+        {
             new(ClaimTypes.UserData, entity.Id.ToString()),
             new(ClaimTypes.Role, entity.Role.ToString())
         };
-        _logger.LogInformation($"Polu4enie tokena pol'zovatelya c email = {email.Encryptor()}.");
+
+        _logger.LogInformation($"Received a token for a lead with email = {email.Encryptor()}({service})");
+        return GenerateToken(service, claims);
+    }
+
+    public string GetTokenForMicroservice(Microservice service)
+    {
+        _logger.LogInformation($"{service} service requested to receive a token for microservices");
+        return GenerateToken(service);
+    }
+
+    public bool CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
+    {
+        _logger.LogInformation($"Received a request to validate a microservices token from {service}");
+        var issuerMicroserviceModel = Microservices.Values.FirstOrDefault(t => t.Microservice.ToString().Equals(issuerToken));
+        if (issuerMicroserviceModel == null || !issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
+        {
+            var ex = new AuthenticationException("Broken token");
+            _logger.LogError(ex, "Token contains invalid data");
+            throw ex;
+        }
+
+        var audiencesFromToken = Regex.Split(audienceToken, ",");
+        if (!audiencesFromToken.Contains(service.ToString()))
+        {
+            var ex = new ForbiddenException($"You don't have access to {service}");
+            _logger.LogError(ex, $"Not contain from audiences ({ex.Message})");
+            throw ex;
+        }
+
+        _logger.LogInformation("Verification token was successful");
+        return true;
+    }
+
+    public bool CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
+    {
+        _logger.LogInformation($"Frontend token validation request received({service})");
+        if (!issuerToken.Equals(service.ToString()))
+        {
+            var ex = new AuthenticationException("Broken token");
+            _logger.LogError(ex, $"The token was not issued for {service} service");
+            throw ex;
+        }
+
+        var frontendFromService = Microservices[service].Frontend.ToString();
+        var audiencesFromToken = Regex.Split(audienceToken, ",");
+        if (!audiencesFromToken.Contains(frontendFromService))
+        {
+            var ex = new ForbiddenException($"{frontendFromService} does not have access");
+            _logger.LogError(ex, $"The token was not issued for {frontendFromService} ({ex.Message})");
+            throw ex;
+        }
+
+        _logger.LogInformation("Verification token was successful");
+        return true;
+    }
+
+    public bool CheckDoubleValidToken(string issuerToken, string audienceToken, Microservice service)
+    {
+        _logger.LogInformation($"Token double validation request received({service})");
+
+        if (issuerToken.Equals(service.ToString()))
+            CheckValidTokenFrontend(issuerToken, audienceToken, service);
+        else
+            CheckValidTokenAmongMicroservices(issuerToken, audienceToken, service);
+
+        return true;
+    }
+
+    public string GetHashPassword(string password)
+    {
+        return PasswordHash.HashPassword(password);
+    }
+
+    private string GenerateToken(Microservice issuerService, IEnumerable<Claim>? claims = null)
+    {
         var jwt = new JwtSecurityToken(
-            AuthOptions.Issuer, //для каждого сервиса свой(кто издал)
-            AuthOptions.Audience, //для каждого сервиса свой(для кого)
+            issuerService.ToString(),
+            Microservices[issuerService].ServicesThatHaveAccess,
             claims,
             expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)),
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-        _logger.LogInformation($"Avtorizaciya pol'zovatelya c email = {email.Encryptor()} prohla uspehno.");
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["secretKey"])),
+                SecurityAlgorithms.HmacSha256));
 
         return new JwtSecurityTokenHandler().WriteToken(jwt);
-
     }
 }
