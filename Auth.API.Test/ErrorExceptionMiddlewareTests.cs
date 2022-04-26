@@ -14,9 +14,12 @@ namespace Auth.API.Test;
 
 public class ErrorExceptionMiddlewareTests
 {
+
+    #region SetUp
+
     #pragma warning disable CS8618
     private DefaultHttpContext _defaultContext;
-    #pragma warning restore CS8618
+        #pragma warning restore CS8618
     private const string ExceptionMassage = "Exception massage";
 
     [SetUp]
@@ -28,6 +31,10 @@ public class ErrorExceptionMiddlewareTests
             Request = { Path = "/" }
         };
     }
+
+    #endregion
+
+    #region Invoke
 
     [Test]
     public void Invoke_ValidRequestReceived_ShouldResponse()
@@ -167,6 +174,8 @@ public class ErrorExceptionMiddlewareTests
         var actual = GetResponseBody();
         Assert.AreEqual(expected, actual);
     }
+
+    #endregion
 
     private static string GetJsonExceptionResponseModel(int statusCode) =>
         JsonSerializer.Serialize(new ExceptionResponseModel { Code = statusCode, Message = ExceptionMassage });
