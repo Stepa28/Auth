@@ -65,9 +65,9 @@ public class ErrorExceptionMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)code;
 
-        var updateModel = new ExceptionResponseModel { Code = (int)code, Message = message };
+        var exceptionModel = new ExceptionResponseModel { Code = (int)code, Message = message };
 
-        var result = JsonSerializer.Serialize(updateModel);
+        var result = JsonSerializer.Serialize(exceptionModel);
         await context.Response.WriteAsync(result);
     }
 }
