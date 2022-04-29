@@ -26,16 +26,16 @@ public class InitializationConfigs : IInitializationConfigs
         _producer = producer;
     }
 
-    public void InitializeConfigs()
+    public async Task InitializeConfigs()
     {
         var token = _authService.GetTokenForMicroservice(Microservice.MarvelousAuth);
 
         try
         {
             _logger.LogInformation($"Attempt to initialize configs from {Microservice.MarvelousConfigs} service");
-            var response = _requestHelper.SendRequest($"{_config[$"{Microservice.MarvelousConfigs}Url"]}{ConfigsEndpoints.Configs}",
+            var response = await _requestHelper.SendRequest($"{_config[$"{Microservice.MarvelousConfigs}Url"]}{ConfigsEndpoints.Configs}",
                 Microservice.MarvelousConfigs,
-                token).Result;
+                token);
 
             foreach (var config in response.Data!)
                 _config[config.Key] = config.Value;
@@ -45,7 +45,7 @@ public class InitializationConfigs : IInitializationConfigs
         {
             var message = $"Failed to initialize configs from {Microservice.MarvelousConfigs} service({ex.Message})";
             _logger.LogWarning(ex, message);
-            _producer.NotifyErrorByEmail(message);
+            await _producer.NotifyErrorByEmail(message);
         }
     }
 }

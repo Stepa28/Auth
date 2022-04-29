@@ -29,7 +29,7 @@ public class ExceptionHelperTests : VerifyHelper
     #region ExceptionHelper
 
     [Test]
-    public void ThrowIfEmailNotFoundTest()
+    public void ThrowIfEmailNotFound_ValidRequestReceived_ShouldNothing()
     {
         //given
         var email = "test@example.com";
@@ -40,7 +40,7 @@ public class ExceptionHelperTests : VerifyHelper
     }
 
     [Test]
-    public void ThrowIfEmailNotFoundNegativeTest_NotFoundException()
+    public void ThrowIfEmailNotFound_WhenLeadDefault_ShouldThrowNotFoundException()
     {
         //given
         var email = "test@example.com";
@@ -56,7 +56,7 @@ public class ExceptionHelperTests : VerifyHelper
     }
 
     [Test]
-    public void ThrowIfPasswordIsIncorrectedTest()
+    public void ThrowIfPasswordIsIncorrected_ValidRequestReceived_ShouldNothing()
     {
         //given
         var password = "test";
@@ -67,7 +67,7 @@ public class ExceptionHelperTests : VerifyHelper
     }
 
     [Test]
-    public void ThrowIfPasswordIsIncorrectedNegativeTest_IncorrectPasswordException()
+    public void ThrowIfPasswordIsIncorrected_WhenIncorrectedPassword_ShouldThrowIncorrectPasswordException()
     {
         //given
         var password = "test";

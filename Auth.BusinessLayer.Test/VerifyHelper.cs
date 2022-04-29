@@ -36,4 +36,11 @@ public abstract class VerifyHelper
         advancedController.Verify(v => v.Audience, Times.Exactly(audience));
         advancedController.Verify(v => v.Identity, Times.Exactly(identity));
     }
+
+    protected static void SetupAdvancedController(Mock<IAdvancedController> advancedController, Microservice service, Microservice audience)
+    {
+        advancedController.Setup(s => s.Service).Returns(service);
+        advancedController.Setup(s => s.Issuer).Returns(service.ToString());
+        advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+    }
 }

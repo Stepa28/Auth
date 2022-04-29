@@ -2,5 +2,5 @@
 
 public interface IInitializationConfigs
 {
-    void InitializeConfigs();
+    Task InitializeConfigs();
 }

@@ -286,9 +286,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenAmongMicroservices(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()))
                     .Throws(new ForbiddenException(expected));
 
@@ -323,9 +321,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenAmongMicroservices(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()))
                     .Throws(new AuthenticationException(expected));
 
@@ -348,9 +344,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = new IdentityResponseModel { Id = 2, Role = Role.Admin.ToString(), IssuerMicroservice = Microservice.MarvelousCrm.ToString() };
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()));
         _advancedController.Setup(s => s.Identity).Returns(expected);
 
@@ -387,9 +381,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new ForbiddenException(expected));
 
         //when
@@ -424,9 +416,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new AuthenticationException(expected));
 
         //when
@@ -445,9 +435,7 @@ public class AuthorizationsControllerTests : VerifyHelper
         //given
         var expected = $"Failed to get lead data from token ({service})";
         var identity = new IdentityResponseModel { IssuerMicroservice = Microservice.MarvelousCrm.ToString() };
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()));
         _advancedController.Setup(s => s.Identity).Returns(identity);
 
@@ -470,9 +458,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = new IdentityResponseModel { Id = 2, Role = Role.Admin.ToString(), IssuerMicroservice = Microservice.MarvelousCrm.ToString() };
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckDoubleValidToken(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()));
         _advancedController.Setup(s => s.Identity).Returns(expected);
 
@@ -509,9 +495,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckDoubleValidToken(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new ForbiddenException(expected));
 
         //when
@@ -547,9 +531,7 @@ public class AuthorizationsControllerTests : VerifyHelper
     {
         //given
         var expected = "Extension massage";
-        _advancedController.Setup(s => s.Service).Returns(service);
-        _advancedController.Setup(s => s.Issuer).Returns(service.ToString());
-        _advancedController.Setup(s => s.Audience).Returns(audience.ToString());
+        SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckDoubleValidToken(IsAny<string>(), IsAny<string>(), IsAny<Microservice>())).Throws(new AuthenticationException(expected));
 
         //when

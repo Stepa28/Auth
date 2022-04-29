@@ -143,6 +143,7 @@ public class AuthorizationsController : Controller
     [SwaggerOperation("Get the string hash of a string (Only marvelous microservices)")]
     public ActionResult<string> GetHashingString([FromBody] string? password)
     {
+        _advancedController.Controller = this;
         _logger.LogInformation($"{_advancedController.Service} asked to hashing password");
         if (password.IsNullOrEmpty())
         {
@@ -151,7 +152,6 @@ public class AuthorizationsController : Controller
             throw ex;
         }
 
-        _advancedController.Controller = this;
         var hash = _authService.GetHashPassword(password!);
         _logger.LogInformation("Hash password send");
 

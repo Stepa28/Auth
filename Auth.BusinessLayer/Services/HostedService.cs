@@ -27,7 +27,7 @@ public class HostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var taskConfig = new Task(() => _configs.InitializeConfigs());
+        var taskConfig = new Task(() => _configs.InitializeConfigs().Wait(stoppingToken));
         _cache.Set("Initialization task configs", taskConfig);
         var taskLead = new Task(() => _leads.InitializeLeads().Wait(stoppingToken));
         _cache.Set("Initialization task lead", taskLead);

@@ -114,13 +114,13 @@ public static class BuilderServicesExtensions
             x.AddConsumer<ConfigChangeConsumer>();
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.ReceiveEndpoint("leadAddOrChangeAuthQueue",
+                cfg.ReceiveEndpoint("LeadAddOrChangeAuth",
                     e =>
                     {
                         e.PurgeOnStartup = true;
                         e.ConfigureConsumer<CrmAddOrChangeLeadConsumer>(context);
                     });
-                cfg.ReceiveEndpoint("leadChangeRoleQueue",
+                cfg.ReceiveEndpoint("LeadChangeRoleAuth",
                     e =>
                     {
                         e.PurgeOnStartup = true;
