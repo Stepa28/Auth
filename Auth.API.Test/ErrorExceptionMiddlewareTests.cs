@@ -19,7 +19,7 @@ public class ErrorExceptionMiddlewareTests
 
     #pragma warning disable CS8618
     private DefaultHttpContext _defaultContext;
-        #pragma warning restore CS8618
+    #pragma warning restore CS8618
     private const string ExceptionMassage = "Exception massage";
 
     [SetUp]
@@ -37,7 +37,7 @@ public class ErrorExceptionMiddlewareTests
     #region Invoke
 
     [Test]
-    public void Invoke_ValidRequestReceived_ShouldResponse()
+    public async Task Invoke_ValidRequestReceived_ShouldResponse()
     {
         //given
         const string expectedOutput = "Request handed over to next request delegate";
@@ -48,7 +48,7 @@ public class ErrorExceptionMiddlewareTests
         });
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -56,14 +56,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowAuthenticationException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowAuthenticationException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(401);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new AuthenticationException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -71,14 +71,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowForbiddenException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowForbiddenException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(403);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new ForbiddenException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -86,14 +86,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowNotFoundException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowNotFoundException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(404);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new NotFoundException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -101,14 +101,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowBadRequestException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowBadRequestException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(400);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new BadRequestException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -116,14 +116,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowServiceUnavailableException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowServiceUnavailableException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(503);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new ServiceUnavailableException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -131,14 +131,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowValidationException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowValidationException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(422);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new ValidationException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -146,14 +146,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowIncorrectPasswordException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowIncorrectPasswordException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(409);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new IncorrectPasswordException(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();
@@ -161,14 +161,14 @@ public class ErrorExceptionMiddlewareTests
     }
 
     [Test]
-    public void Invoke_WhenThrowException_ShouldExceptionResponseModel()
+    public async Task Invoke_WhenThrowException_ShouldExceptionResponseModel()
     {
         //given
         var expected = GetJsonExceptionResponseModel(400);
         var middlewareInstance = new ErrorExceptionMiddleware(_ => throw new Exception(ExceptionMassage));
 
         //when
-        middlewareInstance.Invoke(_defaultContext);
+        await middlewareInstance.Invoke(_defaultContext);
 
         //then
         var actual = GetResponseBody();

@@ -48,8 +48,7 @@ public class AdvancedController : IAdvancedController
             throw ex;
         }
 
-        var tmp = _cache.GetOrCreate(nameof(Microservice),
-                            _ => InitializeMicroserviceModels.InitializeMicroservices())
+        var tmp = _cache.GetOrCreate(nameof(Microservice), _ => InitializeMicroserviceModels.InitializeMicroservices())
                         .FirstOrDefault(t => t.Key.ToString().Equals(Controller.HttpContext.Request.Headers[nameof(Microservice)].First())).Value;
 
         if (tmp is null)

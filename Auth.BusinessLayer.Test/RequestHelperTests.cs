@@ -27,6 +27,7 @@ public class RequestHelperTests : VerifyHelper
     private Mock<IRestClient> _client;
     private RequestHelper<ConfigResponseModel> _requestHelper;
     #pragma warning restore CS8618
+
     private static readonly List<ConfigResponseModel> ListConfigs = new()
     {
         new ConfigResponseModel { Key = "BaseAddress", Value = "80.78.240.4" },
