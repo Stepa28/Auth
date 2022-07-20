@@ -21,7 +21,7 @@ public class ExceptionHelperTests : VerifyHelper
     public void SetUp()
     {
         _logger = new Mock<ILogger<ExceptionsHelper>>();
-        _helper = new ExceptionsHelper(_logger.Object);
+        _helper = new ExceptionsHelper(_logger.Object, _localizer.Object);
     }
 
     #endregion
@@ -45,13 +45,11 @@ public class ExceptionHelperTests : VerifyHelper
         //given
         var email = "test@example.com";
         var lead = new LeadAuthModel();
-        var expected = $"Entity with e-mail = {email} not found";
 
         //when
-        var actual = Assert.Throws<NotFoundException>(() => _helper.ThrowIfEmailNotFound(email, lead))!.Message;
+        Assert.Throws<NotFoundException>(() => _helper.ThrowIfEmailNotFound(email, lead));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -72,13 +70,11 @@ public class ExceptionHelperTests : VerifyHelper
         //given
         var password = "test";
         var hashPassword = "1000:TSv9KT93D9MktmGF2dy0TBcNjXqpy5n1:DTpemnIeUP+QikKqyvQEfY1RgAs=";
-        var expected = "Incorrected password";
 
         //when
-        var actual = Assert.Throws<IncorrectPasswordException>(() => _helper.ThrowIfPasswordIsIncorrected(password, hashPassword))!.Message;
+        Assert.Throws<IncorrectPasswordException>(() => _helper.ThrowIfPasswordIsIncorrected(password, hashPassword));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 

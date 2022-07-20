@@ -38,7 +38,7 @@ public class InitializationConfigsTests : VerifyHelper
         _logger = new Mock<ILogger<InitializationConfigs>>();
         _producer = new Mock<IAuthProducer>();
         _requestHelper = new Mock<IRequestHelper<ConfigResponseModel>>();
-        _initializationConfigs = new InitializationConfigs(_config, _logger.Object, _requestHelper.Object, _authService.Object, _producer.Object);
+        _initializationConfigs = new InitializationConfigs(_config, _logger.Object, _requestHelper.Object, _authService.Object, _producer.Object, _localizer.Object);
     }
 
     #endregion
@@ -82,7 +82,7 @@ public class InitializationConfigsTests : VerifyHelper
         //then
         _requestHelper.Verify(v => v.SendRequest(address + ConfigsEndpoints.Configs, Microservice.MarvelousConfigs, token), Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
-        _producer.Verify(v => v.NotifyErrorByEmail(IsAny<string>()), Times.Once);
+        _producer.Verify(v => v.NotifyErrorByEmail(null), Times.Once);
         Assert.AreEqual(_config["BaseAddress"], "80.78.240.16");
         Assert.IsNull(_config["Address"]);
         Assert.AreEqual(_config[$"{Microservice.MarvelousCrm}Url"], "https://piter-education.ru:5050");

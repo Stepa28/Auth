@@ -32,7 +32,7 @@ public class AccountCheckingChangeRoleConsumerTests : VerifyHelper
         _logger = new Mock<ILogger<AccountCheckingChangeRoleConsumer>>();
         _validator = new LeadShortExchangeModelValidator();
 
-        _consumer = new AccountCheckingChangeRoleConsumer(_logger.Object, _cache, _validator);
+        _consumer = new AccountCheckingChangeRoleConsumer(_logger.Object, _cache, _validator, _localizer.Object);
 
         _cache.Set("test@example.com", new LeadAuthModel { HashPassword = "1000", Role = Role.Vip, Id = 2 });
         _cache.Set("test4@example.com", new LeadAuthModel { HashPassword = "4000", Role = Role.Vip, Id = 3 });

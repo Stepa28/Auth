@@ -35,7 +35,7 @@ public class CrmAddOrChangeLeadConsumerTests : VerifyHelper
         _mapper = new Mapper(new MapperConfiguration(config => config.AddProfile<AutoMapperProfile>()));
         _validator = new LeadFullExchangeModelValidator();
 
-        _consumer = new CrmAddOrChangeLeadConsumer(_logger.Object, _cache, _mapper, _validator);
+        _consumer = new CrmAddOrChangeLeadConsumer(_logger.Object, _cache, _mapper, _validator, _localizer.Object);
     }
 
     #endregion

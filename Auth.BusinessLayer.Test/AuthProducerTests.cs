@@ -27,7 +27,7 @@ public class AuthProducerTests : VerifyHelper
         _bus = new Mock<IBus>();
         _logger = new Mock<ILogger<AuthProducer>>();
 
-        _producer = new AuthProducer(_bus.Object, _logger.Object);
+        _producer = new AuthProducer(_bus.Object, _logger.Object, _localizer.Object);
     }
 
     #endregion

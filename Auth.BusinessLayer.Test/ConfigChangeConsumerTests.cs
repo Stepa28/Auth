@@ -31,7 +31,7 @@ public class ConfigChangeConsumerTests : VerifyHelper
         _logger = new Mock<ILogger<ConfigChangeConsumer>>();
         _validator = new AuthCfgValidator();
 
-        _consumer = new ConfigChangeConsumer(_logger.Object, _config, _validator);
+        _consumer = new ConfigChangeConsumer(_logger.Object, _config, _validator, _localizer.Object);
     }
 
     #endregion

@@ -49,7 +49,7 @@ public class InitializationLeads : IInitializationLeads
             response = await GetRestResponse(ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token);
             if (response is null)
             {
-                var message = _localizer["FailedInitializationLeads", Microservice.MarvelousCrm , Microservice.MarvelousReporting].ToString();
+                var message = _localizer["FailedInitializationLeads", Microservice.MarvelousCrm , Microservice.MarvelousReporting];
                 _logger.LogWarning(message);
                 await _producer.NotifyErrorByEmail(message);
                 return;

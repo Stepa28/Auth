@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Auth.API.Extensions;
+using Auth.Resources;
 using Marvelous.Contracts.Client;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ResponseModels;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RestSharp;
@@ -13,6 +15,12 @@ namespace Auth.BusinessLayer.Test;
 
 public abstract class VerifyHelper
 {
+    protected readonly Mock<IStringLocalizer<ExceptionAndLogMessages>> _localizer;
+    protected VerifyHelper()
+    {
+        _localizer = new Mock<IStringLocalizer<ExceptionAndLogMessages>>();
+    }
+
     protected static void VerifyLogger<T>(Mock<ILogger<T>> logger, LogLevel level, int times)
     {
         logger.Verify(v => v.Log(level,

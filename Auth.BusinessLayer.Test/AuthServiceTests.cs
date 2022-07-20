@@ -47,7 +47,7 @@ public class AuthServiceTests : VerifyHelper
         _config.Setup(s => s["secretKey"]).Returns(SecretKey);
         _microservices = InitializeMicroserviceModels.InitializeMicroservices();
 
-        _authService = new AuthService(_logger.Object, _cache, _exceptionsHelper.Object, _config.Object);
+        _authService = new AuthService(_logger.Object, _cache, _exceptionsHelper.Object, _config.Object, _localizer.Object);
     }
 
     #endregion
@@ -121,14 +121,10 @@ public class AuthServiceTests : VerifyHelper
     [Test]
     public void GetTokenForFront_WhenLeadInitializationNotCompleted_ShouldThrowServiceUnavailableException()
     {
-        //given
-        var expected = "Microservice initialize leads was not completed";
-
-        //when
-        var actual = Assert.Throws<ServiceUnavailableException>(() => _authService.GetTokenForFront("", "", 0))!.Message;
+        //given when
+        Assert.Throws<ServiceUnavailableException>(() => _authService.GetTokenForFront("", "", 0));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -184,15 +180,11 @@ public class AuthServiceTests : VerifyHelper
     [Test]
     public void CheckValidTokenAmongMicroservices_WhenTokenContainsInvalidData_ShouldThrowAuthenticationException()
     {
-        //given
-        var expected = "Broken token";
-
-        //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
-            _authService.CheckValidTokenAmongMicroservices(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
+        //given when
+        Assert.Throws<AuthenticationException>(() =>
+            _authService.CheckValidTokenAmongMicroservices(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 1);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -202,15 +194,11 @@ public class AuthServiceTests : VerifyHelper
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
     public void CheckValidTokenAmongMicroservices_WhenNoAccessRights_ShouldThrowForbiddenException(Microservice issuerToken, Microservice service)
     {
-        //given
-        var expected = $"You don't have access to {service}";
-
-        //when
-        var actual = Assert.Throws<ForbiddenException>(() =>
-            _authService.CheckValidTokenAmongMicroservices(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service))!.Message;
+        //given when
+        Assert.Throws<ForbiddenException>(() =>
+            _authService.CheckValidTokenAmongMicroservices(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 1);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -235,15 +223,11 @@ public class AuthServiceTests : VerifyHelper
     [Test]
     public void CheckValidTokenFrontend_WhenChecksNotTheIssuerOfTheToken_ShouldThrowAuthenticationException()
     {
-        //given
-        var expected = "Broken token";
-
-        //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
-            _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
+        //given when
+        Assert.Throws<AuthenticationException>(() =>
+            _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 1);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -251,16 +235,12 @@ public class AuthServiceTests : VerifyHelper
     [Test]
     public void CheckValidTokenFrontend_WhenNoAccessRights_ShouldThrowForbiddenException()
     {
-        //given
-        var expected = $"{Microservice.MarvelousFrontendCrm} does not have access";
-
-        //when
-        var actual = Assert.Throws<ForbiddenException>(() => _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(),
+       //given when
+        Assert.Throws<ForbiddenException>(() => _authService.CheckValidTokenFrontend(Microservice.MarvelousCrm.ToString(),
             _microservices[Microservice.MarvelousReporting].ServicesThatHaveAccess,
-            Microservice.MarvelousCrm))!.Message;
+            Microservice.MarvelousCrm));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 1);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -285,16 +265,12 @@ public class AuthServiceTests : VerifyHelper
     [Test]
     public void CheckDoubleValidToken_Frontend_WhenNoAccessRights_ShouldThrowForbiddenException()
     {
-        //given
-        var expected = $"{Microservice.MarvelousFrontendCrm} does not have access";
-
-        //when
-        var actual = Assert.Throws<ForbiddenException>(() => _authService.CheckDoubleValidToken(Microservice.MarvelousCrm.ToString(),
+        //given when
+        Assert.Throws<ForbiddenException>(() => _authService.CheckDoubleValidToken(Microservice.MarvelousCrm.ToString(),
             _microservices[Microservice.MarvelousReporting].ServicesThatHaveAccess,
-            Microservice.MarvelousCrm))!.Message;
+            Microservice.MarvelousCrm));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 2);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -315,15 +291,11 @@ public class AuthServiceTests : VerifyHelper
     [Test]
     public void CheckDoubleValidToken_Microservice_WhenTokenContainsInvalidData_ShouldThrowAuthenticationException()
     {
-        //given
-        var expected = "Broken token";
-
-        //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
-            _authService.CheckDoubleValidToken(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore))!.Message;
+        //given when
+       Assert.Throws<AuthenticationException>(() =>
+            _authService.CheckDoubleValidToken(Microservice.MarvelousCrm.ToString(), "", Microservice.MarvelousTransactionStore));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 2);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -333,15 +305,11 @@ public class AuthServiceTests : VerifyHelper
     [TestCase(Microservice.MarvelousCrm, Microservice.MarvelousReporting)]
     public void CheckDoubleValidToken_Microservice_WhenNoAccessRights_ShouldThrowForbiddenException(Microservice issuerToken, Microservice service)
     {
-        //given
-        var expected = $"You don't have access to {service}";
-
-        //when
-        var actual = Assert.Throws<ForbiddenException>(() =>
-            _authService.CheckDoubleValidToken(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service))!.Message;
+        //given when
+        Assert.Throws<ForbiddenException>(() =>
+            _authService.CheckDoubleValidToken(issuerToken.ToString(), _microservices[issuerToken].ServicesThatHaveAccess, service));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Information, 2);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }

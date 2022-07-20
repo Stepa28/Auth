@@ -48,7 +48,7 @@ public class InitializationLeadsTests : VerifyHelper
         _cache = new MemoryCache(new MemoryCacheOptions());
         _config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()).Build();
 
-        _initializationLeads = new InitializationLeads(_requestHelper.Object, _logger.Object, _mapper, _cache, _producer.Object, _authService.Object, _config);
+        _initializationLeads = new InitializationLeads(_requestHelper.Object, _logger.Object, _mapper, _cache, _producer.Object, _authService.Object, _config, _localizer.Object);
     }
 
     #endregion
@@ -128,8 +128,7 @@ public class InitializationLeadsTests : VerifyHelper
             v => v.SendRequest(addressRep + ReportingEndpoints.ApiLeads + ReportingEndpoints.GetAllLeads, Microservice.MarvelousReporting, token),
             Times.Once);
         _authService.Verify(v => v.GetTokenForMicroservice(Microservice.MarvelousAuth), Times.Once);
-        _producer.Verify(v => v.NotifyErrorByEmail($"Initialization leads with {Microservice.MarvelousCrm} and {Microservice.MarvelousReporting} failed"),
-            Times.Once);
+        _producer.Verify(v => v.NotifyErrorByEmail(null), Times.Once);
         Assert.IsFalse(_cache.Get<bool>("Initialization leads"));
         VerifyLogger(_logger, LogLevel.Information, 2);
         VerifyLogger(_logger, LogLevel.Error, 2);

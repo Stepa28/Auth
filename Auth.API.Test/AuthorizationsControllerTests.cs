@@ -44,7 +44,7 @@ public class AuthorizationsControllerTests : VerifyHelper
         _authService = new Mock<IAuthService>();
         _validator = new AuthRequestModelValidator();
 
-        _controller = new AuthorizationsController(_authService.Object, _logger.Object, _cache, _validator, _advancedController.Object);
+        _controller = new AuthorizationsController(_authService.Object, _logger.Object, _cache, _validator, _advancedController.Object, _localizer.Object);
     }
 
     #endregion
@@ -153,14 +153,10 @@ public class AuthorizationsControllerTests : VerifyHelper
     [Test]
     public void Login_WhenAuthModelIsNull_ShouldThrowBadRequestException()
     {
-        //given
-        var expected = "You must specify the table details in the request body";
-
-        //when
-        var actual = Assert.Throws<BadRequestException>(() => _controller.Login(null))!.Message;
+        //given when
+        Assert.Throws<BadRequestException>(() => _controller.Login(null));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyAdvancedController(_advancedController, 0, 0, 0, 0);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
@@ -433,18 +429,16 @@ public class AuthorizationsControllerTests : VerifyHelper
     public void CheckTokenFrontend_WhenIdentityNotExistsId_ShouldThrowForbiddenException(Microservice service, Microservice audience)
     {
         //given
-        var expected = $"Failed to get lead data from token ({service})";
         var identity = new IdentityResponseModel { IssuerMicroservice = Microservice.MarvelousCrm.ToString() };
         SetupAdvancedController(_advancedController, service, audience);
         _authService.Setup(s => s.CheckValidTokenFrontend(IsAny<string>(), IsAny<string>(), IsAny<Microservice>()));
         _advancedController.Setup(s => s.Identity).Returns(identity);
 
         //when
-        var actual = Assert.Throws<ForbiddenException>(() => _controller.CheckTokenFrontend())!.Message;
+        Assert.Throws<ForbiddenException>(() => _controller.CheckTokenFrontend());
 
         //then
         _authService.Verify(v => v.CheckValidTokenFrontend(service.ToString(), audience.ToString(), service), Times.Once);
-        Assert.AreEqual(expected, actual);
         VerifyAdvancedController(_advancedController, 2, 1, 1, 1);
         VerifyLogger(_logger, IsAny<LogLevel>(), 0);
     }
@@ -589,14 +583,12 @@ public class AuthorizationsControllerTests : VerifyHelper
     public void GetHashingString_WhenPasswordIsNullOrEmpty_ShouldThrowBadRequestException(Microservice service)
     {
         //given
-        var expected = "You must specify the table details in the request body";
         _advancedController.Setup(s => s.Service).Returns(service);
 
         //when
-        var actual = Assert.Throws<BadRequestException>(() => _controller.GetHashingString(null))!.Message;
+        Assert.Throws<BadRequestException>(() => _controller.GetHashingString(null));
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyAdvancedController(_advancedController, 1, 0, 0, 0);
         VerifyLogger(_logger, LogLevel.Information, 1);
         VerifyLogger(_logger, LogLevel.Error, 1);

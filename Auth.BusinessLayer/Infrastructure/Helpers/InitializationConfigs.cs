@@ -47,7 +47,7 @@ public class InitializationConfigs : IInitializationConfigs
         }
         catch (Exception ex)
         {
-            var message = _localizer["FailedInitializeConfigs", Microservice.MarvelousConfigs, ex.Message].ToString();
+            var message = _localizer["FailedInitializeConfigs", Microservice.MarvelousConfigs, ex.Message];
             _logger.LogWarning(ex, message);
             await _producer.NotifyErrorByEmail(message);
         }

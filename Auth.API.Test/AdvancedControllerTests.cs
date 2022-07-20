@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 using Auth.API.Extensions;
 using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Test;
+using Auth.Resources;
 using Marvelous.Contracts.Enums;
 using Marvelous.Contracts.ResponseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using static Moq.It;
@@ -41,7 +44,7 @@ public class AdvancedControllerTests : VerifyHelper
         _cache = new MemoryCache(new MemoryCacheOptions());
         _context = new Mock<HttpContext>();
 
-        _advancedController = new AdvancedController(_logger.Object, _cache, _config);
+        _advancedController = new AdvancedController(_logger.Object, _cache, _config, _localizer.Object);
         _controller = new HomeController();
         _advancedController.Controller = _controller;
     }
@@ -74,16 +77,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _cache.Set("Initialization task configs", Task.CompletedTask);
         _controller.ControllerContext.HttpContext = new DefaultHttpContext { Connection = { RemoteIpAddress = IPAddress.Parse("1") } };
-        var expected = "Your ip is not registered";
 
         //when
-        var actual = Assert.Throws<ForbiddenException>(() =>
+        Assert.Throws<ForbiddenException>(() =>
         {
             var _ = _advancedController.Service;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -93,16 +94,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _cache.Set("Initialization task configs", Task.CompletedTask);
         _controller.ControllerContext.HttpContext = new DefaultHttpContext { Connection = { RemoteIpAddress = IPAddress.Parse(_config["BaseAddress"]) } };
-        var expected = "Failed to identify service (no head)";
 
         //when
-        var actual = Assert.Throws<ForbiddenException>(() =>
+        Assert.Throws<ForbiddenException>(() =>
         {
             var _ = _advancedController.Service;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -115,16 +114,14 @@ public class AdvancedControllerTests : VerifyHelper
         context.Request.Headers.Add(nameof(Microservice), Microservice.MarvelousFrontendUndefined.ToString());
         context.Connection.RemoteIpAddress = IPAddress.Parse(_config["BaseAddress"]);
         _controller.ControllerContext.HttpContext = context;
-        var expected = "Failed to identify service (invalid head)";
 
         //when
-        var actual = Assert.Throws<ForbiddenException>(() =>
+        Assert.Throws<ForbiddenException>(() =>
         {
             var _ = _advancedController.Service;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -153,16 +150,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _context.Setup(s => s.User).Returns(new ClaimsPrincipal());
         _controller.ControllerContext.HttpContext = _context.Object;
-        var expected = "Broken token";
 
         //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
+        Assert.Throws<AuthenticationException>(() =>
         {
             var _ = _advancedController.Audience;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -172,16 +167,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _context.Setup(s => s.User).Returns(new ClaimsPrincipal(new ClaimsIdentity()));
         _controller.ControllerContext.HttpContext = _context.Object;
-        var expected = "Broken token";
 
         //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
+        Assert.Throws<AuthenticationException>(() =>
         {
             var _ = _advancedController.Audience;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -210,16 +203,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _context.Setup(s => s.User).Returns(new ClaimsPrincipal());
         _controller.ControllerContext.HttpContext = _context.Object;
-        var expected = "Broken token";
 
         //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
+        Assert.Throws<AuthenticationException>(() =>
         {
             var _ = _advancedController.Issuer;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -229,16 +220,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _context.Setup(s => s.User).Returns(new ClaimsPrincipal(new ClaimsIdentity()));
         _controller.ControllerContext.HttpContext = _context.Object;
-        var expected = "Broken token";
 
         //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
+        Assert.Throws<AuthenticationException>(() =>
         {
             var _ = _advancedController.Issuer;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
@@ -293,16 +282,14 @@ public class AdvancedControllerTests : VerifyHelper
         //given
         _context.Setup(s => s.User).Returns(new ClaimsPrincipal());
         _controller.ControllerContext.HttpContext = _context.Object;
-        var expected = "Broken token";
 
         //when
-        var actual = Assert.Throws<AuthenticationException>(() =>
+        Assert.Throws<AuthenticationException>(() =>
         {
             var _ = _advancedController.Identity;
-        })?.Message;
+        });
 
         //then
-        Assert.AreEqual(expected, actual);
         VerifyLogger(_logger, LogLevel.Error, 1);
     }
 
