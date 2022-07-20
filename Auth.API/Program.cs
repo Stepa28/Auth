@@ -1,8 +1,10 @@
+using System.Globalization;
 using Auth.API.Extensions;
 using Auth.API.Infrastructure;
 using Auth.BusinessLayer.Configuration;
 using Auth.BusinessLayer.Services;
 using Marvelous.Contracts.Enums;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 const string logDirectoryVariableName = "LOG_DIRECTORY";
@@ -31,11 +33,24 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddFluentValidation();
 
 builder.Services.AddHostedService<HostedService>();
+builder.Services.AddLocalization();
 
 var app = builder.Build();
 
 app.Configuration["secretKey"] = secretKey;
 app.Configuration[$"{Microservice.MarvelousConfigs}Url"] = configUrl;
+
+var supportedCultures = new[]
+{
+    new CultureInfo("en"),
+    new CultureInfo("ru")
+};
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.BusinessLayer.Test", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.API.Test", "Auth.API.Test\Auth.API.Test.csproj", "{BD95D598-C351-43A0-8019-638855068686}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Resources", "Auth.Resources\Auth.Resources.csproj", "{278CC7E2-F1D5-45F0-B491-167A1F635595}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BD95D598-C351-43A0-8019-638855068686}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD95D598-C351-43A0-8019-638855068686}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD95D598-C351-43A0-8019-638855068686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{278CC7E2-F1D5-45F0-B491-167A1F635595}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{278CC7E2-F1D5-45F0-B491-167A1F635595}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{278CC7E2-F1D5-45F0-B491-167A1F635595}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{278CC7E2-F1D5-45F0-B491-167A1F635595}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

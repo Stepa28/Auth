@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -7,13 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="11.0.1"/>
-        <PackageReference Include="FluentValidation" Version="10.4.0"/>
-        <PackageReference Include="Marvelous.Contracts" Version="1.2.3"/>
-        <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.1"/>
-        <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4"/>
-        <PackageReference Include="RestSharp" Version="107.3.0"/>
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0"/>
+        <PackageReference Include="AutoMapper" Version="11.0.1" />
+        <PackageReference Include="FluentValidation" Version="10.4.0" />
+        <PackageReference Include="Marvelous.Contracts" Version="1.2.3" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="6.0.6" />
+        <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
+        <PackageReference Include="RestSharp" Version="107.3.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -23,7 +24,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="MassTransit"/>
+        <Folder Include="MassTransit" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Auth.Resources\Auth.Resources.csproj" />
     </ItemGroup>
 
 </Project>

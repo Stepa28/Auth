@@ -2,6 +2,7 @@
 using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Security;
 using Auth.BusinessLayer.Services;
+using Auth.Resources;
 using FluentValidation;
 using Marvelous.Contracts.Endpoints;
 using Marvelous.Contracts.Enums;
@@ -9,6 +10,7 @@ using Marvelous.Contracts.RequestModels;
 using Marvelous.Contracts.ResponseModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -23,15 +25,17 @@ public class AuthorizationsController : Controller
     private readonly IMemoryCache _cache;
     private readonly ILogger<AuthorizationsController> _logger;
     private readonly IValidator<AuthRequestModel> _validator;
+    private readonly IStringLocalizer<ExceptionAndLogMessages> _localizer;
 
     public AuthorizationsController(IAuthService authService, ILogger<AuthorizationsController> logger, IMemoryCache cache,
-        IValidator<AuthRequestModel> validator, IAdvancedController advancedController)
+        IValidator<AuthRequestModel> validator, IAdvancedController advancedController, IStringLocalizer<ExceptionAndLogMessages> localizer)
     {
         _authService = authService;
         _logger = logger;
         _cache = cache;
         _validator = validator;
         _advancedController = advancedController;
+        _localizer = localizer;
     }
 
     //api/auth/login
@@ -48,7 +52,7 @@ public class AuthorizationsController : Controller
     {
         if (auth == null)
         {
-            var ex = new BadRequestException("You must specify the table details in the request body");
+            var ex = new BadRequestException(_localizer["AuthRequestModelIsNull"]);
             _logger.LogError(ex, ex.Message);
             throw ex;
         }
@@ -62,9 +66,9 @@ public class AuthorizationsController : Controller
 
         _cache.Get<Task>("Initialization task lead").Wait();
         _advancedController.Controller = this;
-        _logger.LogInformation($"Received a request to receive a token by email = {auth.Email.Encryptor()}");
+        _logger.LogInformation(_localizer["RequestTokenByAuthRequestModel", auth.Email.Encryptor()]);
         var token = _authService.GetTokenForFront(auth.Email, auth.Password, _advancedController.Service);
-        _logger.LogInformation("Token sent");
+        _logger.LogInformation(_localizer["TokenSent"]);
 
         return Ok(token);
     }
@@ -78,7 +82,7 @@ public class AuthorizationsController : Controller
     {
         _advancedController.Controller = this;
         var token = _authService.GetTokenForMicroservice(_advancedController.Service);
-        _logger.LogInformation("Token sent");
+        _logger.LogInformation(_localizer["TokenSent"]);
 
         return Ok(token);
     }
@@ -94,7 +98,7 @@ public class AuthorizationsController : Controller
         _advancedController.Controller = this;
         if (_advancedController.Issuer.Equals(Microservice.MarvelousAuth.ToString()))
         {
-            _logger.LogInformation("Request received to verify token issued by MarvelousAuth");
+            _logger.LogInformation(_localizer["ReceivedVerifyTokenIssuedByMarvelousAuth"]);
             return Ok(_advancedController.Identity);
         }
 
@@ -117,7 +121,7 @@ public class AuthorizationsController : Controller
         if (identity.Id != null)
             return Ok(identity);
 
-        var ex = new ForbiddenException($"Failed to get lead data from token ({_advancedController.Service})");
+        var ex = new ForbiddenException(_localizer["FailedToGetLeadData", _advancedController.Service]);
         _logger.LogWarning(ex, ex.Message);
         throw ex;
     }
@@ -144,16 +148,16 @@ public class AuthorizationsController : Controller
     public ActionResult<string> GetHashingString([FromBody] string? password)
     {
         _advancedController.Controller = this;
-        _logger.LogInformation($"{_advancedController.Service} asked to hashing password");
+        _logger.LogInformation(_localizer["ReceivedRequestHashingPassword", _advancedController.Service]);
         if (password.IsNullOrEmpty())
         {
-            var ex = new BadRequestException("You must specify the table details in the request body");
+            var ex = new BadRequestException(_localizer["PasswordIsNull"]);
             _logger.LogError(ex, ex.Message);
             throw ex;
         }
 
         var hash = _authService.GetHashPassword(password!);
-        _logger.LogInformation("Hash password send");
+        _logger.LogInformation(_localizer["HashPasswordSend"]);
 
         return Ok(hash);
     }

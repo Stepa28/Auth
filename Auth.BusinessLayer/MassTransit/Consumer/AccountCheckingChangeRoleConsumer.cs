@@ -1,8 +1,10 @@
 ﻿using Auth.BusinessLayer.Models;
+using Auth.Resources;
 using FluentValidation;
 using Marvelous.Contracts.ExchangeModels;
 using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -13,12 +15,14 @@ public class AccountCheckingChangeRoleConsumer : IConsumer<LeadShortExchangeMode
     private readonly IMemoryCache _cache;
     private readonly ILogger<AccountCheckingChangeRoleConsumer> _logger;
     private readonly IValidator<LeadShortExchangeModel> _validator;
+    private readonly IStringLocalizer<ExceptionAndLogMessages> _localizer;
 
-    public AccountCheckingChangeRoleConsumer(ILogger<AccountCheckingChangeRoleConsumer> logger, IMemoryCache cache, IValidator<LeadShortExchangeModel> validator)
+    public AccountCheckingChangeRoleConsumer(ILogger<AccountCheckingChangeRoleConsumer> logger, IMemoryCache cache, IValidator<LeadShortExchangeModel> validator, IStringLocalizer<ExceptionAndLogMessages> localizer)
     {
         _logger = logger;
         _cache = cache;
         _validator = validator;
+        _localizer = localizer;
     }
 
     public Task Consume(ConsumeContext<LeadShortExchangeModel[]> context)
@@ -26,7 +30,7 @@ public class AccountCheckingChangeRoleConsumer : IConsumer<LeadShortExchangeMode
         foreach (var entity in context.Message)
             _validator.ValidateAndThrow(entity);
 
-        _logger.LogInformation("Change role Leads");
+        _logger.LogInformation(_localizer["ChangeRoleLeads"]);
         foreach (var lead in context.Message)
         {
             var tmp = _cache.Get<LeadAuthModel>(lead.Email);

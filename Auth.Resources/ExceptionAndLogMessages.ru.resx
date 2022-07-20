@@ -1,0 +1,137 @@
+﻿<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="UnresolvedIp" xml:space="preserve">
+        <value>Ваш ip не зарегистрирован</value>
+    </data>
+    <data name="FailedIdentifyNoHead" xml:space="preserve">
+        <value>Не удалось идентифицировать сервис (нет заголовока)</value>
+    </data>
+    <data name="EmailNotFound" xml:space="preserve">
+        <value>Объект с адресом электронной почты = {0} не найден</value>
+    </data>
+    <data name="FailedInitializationLeads" xml:space="preserve">
+        <value>Инициализация lead через {0} и {1} не удалось</value>
+    </data>
+    <data name="AlertSent" xml:space="preserve">
+        <value>Отправлено предупреждение об ошибке инициализации</value>
+    </data>
+    <data name="AttemptInitialize" xml:space="preserve">
+        <value>Попытка инициализации из сервиса {0}</value>
+    </data>
+    <data name="AttemptInitializeConfigs" xml:space="preserve">
+        <value>Попытка инициализировать конфигурации из сервиса {0}</value>
+    </data>
+    <data name="BrokenToken" xml:space="preserve">
+        <value>Сломанный токен</value>
+    </data>
+    <data name="BrokenTokenDecoding" xml:space="preserve">
+        <value>Токен не содержит claims, возможного истечения срока действия или неправильного секретного ключа</value>
+    </data>
+    <data name="ChangeRoleLeads" xml:space="preserve">
+        <value>Изменение ролей Leads</value>
+    </data>
+    <data name="ConfigurationChange" xml:space="preserve">
+        <value>Конфигурация {0} изменить значение с {1} на {2}</value>
+    </data>
+    <data name="DontHaveAccess" xml:space="preserve">
+        <value>У вас нет доступа к {0}</value>
+    </data>
+    <data name="FailedIdentifyInvalidHead" xml:space="preserve">
+        <value>Не удалось идентифицировать сервис (неверный заголовок)</value>
+    </data>
+    <data name="FailedInitialize" xml:space="preserve">
+        <value>Не удалось инициализировать через сервис {0} ({1})</value>
+    </data>
+    <data name="FailedInitializeConfigs" xml:space="preserve">
+        <value>Не удалось инициализировать конфигурации из сервиса {0} ({1})</value>
+    </data>
+    <data name="InitializeLeadsSuccessfully" xml:space="preserve">
+        <value>Инициализация leads: завершено успешно</value>
+    </data>
+    <data name="InitializeLeadsWasNotCompleted" xml:space="preserve">
+        <value>Инициализация leads микросервиса не завершена</value>
+    </data>
+    <data name="InitializeSuccessfully" xml:space="preserve">
+        <value>Инициализация из службы {0}: завершена успешно</value>
+    </data>
+    <data name="NotAudiences" xml:space="preserve">
+        <value>Токен не содержит audiences ({0})</value>
+    </data>
+    <data name="PasswordIsIncorrected" xml:space="preserve">
+        <value>Неверный пароль</value>
+    </data>
+    <data name="ReceivedToken" xml:space="preserve">
+        <value>Получен токен для входа с адресом электронной почты = {0} ({1})</value>
+    </data>
+    <data name="ReceiveTokenForMicroservices" xml:space="preserve">
+        <value>Служба {0} запросила получение токена для микросервиса</value>
+    </data>
+    <data name="RemoveLead" xml:space="preserve">
+        <value>Удалить интерес с идентификатором = {0}</value>
+    </data>
+    <data name="ReportFailedInitialization" xml:space="preserve">
+        <value>Попытка сообщить о неудачной инициализации</value>
+    </data>
+    <data name="RequestValidateToken" xml:space="preserve">
+        <value>Получен запрос на проверку токена микросервисов от {0}.</value>
+    </data>
+    <data name="ResponseSuccessfully" xml:space="preserve">
+        <value>Ответ от службы {0}: получен успешно</value>
+    </data>
+    <data name="TokenContainsInvalidData" xml:space="preserve">
+        <value>Токен содержит неверные данные</value>
+    </data>
+    <data name="TokenDoesntAudience" xml:space="preserve">
+        <value>Токен не содержит audience</value>
+    </data>
+    <data name="TokenDoubleValidation" xml:space="preserve">
+        <value>Получен запрос на двойную проверку токена ({0})</value>
+    </data>
+    <data name="VerificationSuccessful" xml:space="preserve">
+        <value>Токен проверки прошел успешно</value>
+    </data>
+    <data name="FrontRequestValidateToken" xml:space="preserve">
+        <value>Получен запрос проверки токена Frontend-ом ({0})</value>
+    </data>
+    <data name="TokenWasNotIssuedForService" xml:space="preserve">
+        <value>Токен не был выпущен для службы {0} ({1})</value>
+    </data>
+    <data name="FrontendDoesntAccess" xml:space="preserve">
+        <value>У {0} нет доступа к сервису пославшему запрос</value>
+    </data>
+    <data name="AuthRequestModelIsNull" xml:space="preserve">
+        <value>Вы должны указать данные авторизации в теле запроса</value>
+    </data>
+    <data name="TokenSent" xml:space="preserve">
+        <value>Токен отправлен</value>
+    </data>
+    <data name="HashPasswordSend" xml:space="preserve">
+        <value>Хэш-пароль отправлен</value>
+    </data>
+    <data name="RequestTokenByAuthRequestModel" xml:space="preserve">
+        <value>Получен запрос на получение токена из AuthRequestModel = {0}</value>
+    </data>
+    <data name="ReceivedVerifyTokenIssuedByMarvelousAuth" xml:space="preserve">
+        <value>Получен запрос на проверку токена, выпущенного MarvelousAuth.</value>
+    </data>
+    <data name="FailedToGetLeadData" xml:space="preserve">
+        <value>Не удалось получить данные о лидах из токена ({0})</value>
+    </data>
+    <data name="ReceivedRequestHashingPassword" xml:space="preserve">
+        <value>{0} попросил хешировать пароль</value>
+    </data>
+    <data name="PasswordIsNull" xml:space="preserve">
+        <value>Вы должны указать данные пароля в теле запроса</value>
+    </data>
+</root>

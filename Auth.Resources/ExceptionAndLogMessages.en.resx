@@ -1,0 +1,137 @@
+﻿<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="UnresolvedIp" xml:space="preserve">
+        <value>Your ip is not registered</value>
+    </data>
+    <data name="FailedIdentifyNoHead" xml:space="preserve">
+        <value>Failed to identify service (no head)</value>
+    </data>
+    <data name="FailedIdentifyInvalidHead" xml:space="preserve">
+        <value>Failed to identify service (invalid head)</value>
+    </data>
+    <data name="EmailNotFound" xml:space="preserve">
+        <value>Entity with e-mail = {0} not found</value>
+    </data>
+    <data name="BrokenToken" xml:space="preserve">
+        <value>Broken token</value>
+    </data>
+    <data name="TokenDoesntAudience" xml:space="preserve">
+        <value>Token doesn't contain audience</value>
+    </data>
+    <data name="BrokenTokenDecoding" xml:space="preserve">
+        <value>Token doesn't contain claims, possible expiration or incorrect secret key</value>
+    </data>
+    <data name="PasswordIsIncorrected" xml:space="preserve">
+        <value>Incorrected password</value>
+    </data>
+    <data name="AttemptInitializeConfigs" xml:space="preserve">
+        <value>Attempt to initialize configs from {0} service</value>
+    </data>
+    <data name="InitializeSuccessfully" xml:space="preserve">
+        <value>Initialize from {0} service: completed successfully</value>
+    </data>
+    <data name="FailedInitializeConfigs" xml:space="preserve">
+        <value>Failed to initialize configs from {0} service ({1})</value>
+    </data>
+    <data name="AttemptInitialize" xml:space="preserve">
+        <value>Attempt to initialize from {0} service</value>
+    </data>
+    <data name="FailedInitialize" xml:space="preserve">
+        <value>Failed to initialize from {0} service ({1})</value>
+    </data>
+    <data name="FailedInitializationLeads" xml:space="preserve">
+        <value>Initialization leads with {0} and {1} failed</value>
+    </data>
+    <data name="InitializeLeadsSuccessfully" xml:space="preserve">
+        <value>Initialization leads: completed successfully</value>
+    </data>
+    <data name="ResponseSuccessfully" xml:space="preserve">
+        <value>Response from service {0}: received successfully</value>
+    </data>
+    <data name="ChangeRoleLeads" xml:space="preserve">
+        <value>Change role Leads</value>
+    </data>
+    <data name="ConfigurationChange" xml:space="preserve">
+        <value>Configuration {0} change value {1} to {2}</value>
+    </data>
+    <data name="RemoveLead" xml:space="preserve">
+        <value>Remove Lead with id = {0}</value>
+    </data>
+    <data name="ReportFailedInitialization" xml:space="preserve">
+        <value>Attempt to report failed initialization</value>
+    </data>
+    <data name="AlertSent" xml:space="preserve">
+        <value>Initialization failure alert sent</value>
+    </data>
+    <data name="InitializeLeadsWasNotCompleted" xml:space="preserve">
+        <value>Microservice initialize leads was not completed</value>
+    </data>
+    <data name="ReceivedToken" xml:space="preserve">
+        <value>Received a token for a lead with email = {0} ({1})</value>
+    </data>
+    <data name="ReceiveTokenForMicroservices" xml:space="preserve">
+        <value>{0} service requested to receive a token for microservices</value>
+    </data>
+    <data name="RequestValidateToken" xml:space="preserve">
+        <value>Received a request to validate a microservices token from {0}</value>
+    </data>
+    <data name="TokenContainsInvalidData" xml:space="preserve">
+        <value>Token contains invalid data</value>
+    </data>
+    <data name="VerificationSuccessful" xml:space="preserve">
+        <value>Verification token was successful</value>
+    </data>
+    <data name="DontHaveAccess" xml:space="preserve">
+        <value>You don't have access to {0}</value>
+    </data>
+    <data name="NotAudiences" xml:space="preserve">
+        <value>Not contain from audiences ({0})</value>
+    </data>
+    <data name="TokenDoubleValidation" xml:space="preserve">
+        <value>Token double validation request received({0})</value>
+    </data>
+    <data name="FrontRequestValidateToken" xml:space="preserve">
+        <value>Frontend token validation request received ({0})</value>
+    </data>
+    <data name="TokenWasNotIssuedForService" xml:space="preserve">
+        <value>The token was not issued for {0} service ({1})</value>
+    </data>
+    <data name="FrontendDoesntAccess" xml:space="preserve">
+        <value>{0} does not have access</value>
+    </data>
+    <data name="AuthRequestModelIsNull" xml:space="preserve">
+        <value>You must specify the auth details in the request body</value>
+    </data>
+    <data name="TokenSent" xml:space="preserve">
+        <value>Token sent</value>
+    </data>
+    <data name="HashPasswordSend" xml:space="preserve">
+        <value>Hash password send</value>
+    </data>
+    <data name="RequestTokenByAuthRequestModel" xml:space="preserve">
+        <value>Received a request to receive a token by AuthRequestModel = {0}</value>
+    </data>
+    <data name="ReceivedVerifyTokenIssuedByMarvelousAuth" xml:space="preserve">
+        <value>Request received to verify token issued by MarvelousAuth</value>
+    </data>
+    <data name="FailedToGetLeadData" xml:space="preserve">
+        <value>Failed to get lead data from token ({0})</value>
+    </data>
+    <data name="ReceivedRequestHashingPassword" xml:space="preserve">
+        <value>{0} asked to hashing password</value>
+    </data>
+    <data name="PasswordIsNull" xml:space="preserve">
+        <value>You must specify the password details in the request body</value>
+    </data>
+</root>

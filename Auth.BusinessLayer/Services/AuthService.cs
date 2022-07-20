@@ -7,9 +7,11 @@ using Auth.BusinessLayer.Exceptions;
 using Auth.BusinessLayer.Helpers;
 using Auth.BusinessLayer.Models;
 using Auth.BusinessLayer.Security;
+using Auth.Resources;
 using Marvelous.Contracts.Enums;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -21,13 +23,15 @@ public class AuthService : IAuthService
     private readonly IConfiguration _config;
     private readonly IExceptionsHelper _exceptionsHelper;
     private readonly ILogger<AuthService> _logger;
+    private readonly IStringLocalizer<ExceptionAndLogMessages> _localizer;
 
-    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IConfiguration config)
+    public AuthService(ILogger<AuthService> logger, IMemoryCache memoryCache, IExceptionsHelper exceptionsHelper, IConfiguration config, IStringLocalizer<ExceptionAndLogMessages> localizer)
     {
         _logger = logger;
         _cache = memoryCache;
         _exceptionsHelper = exceptionsHelper;
         _config = config;
+        _localizer = localizer;
     }
 
     private Dictionary<Microservice, MicroserviceModel> Microservices =>
@@ -37,7 +41,7 @@ public class AuthService : IAuthService
     {
         if (!_cache.Get<bool>("Initialization leads"))
         {
-            var ex = new ServiceUnavailableException("Microservice initialize leads was not completed");
+            var ex = new ServiceUnavailableException(_localizer["InitializeLeadsWasNotCompleted"]);
             _logger.LogError(ex, ex.Message);
             throw ex;
         }
@@ -52,46 +56,46 @@ public class AuthService : IAuthService
             new(ClaimTypes.Role, entity.Role.ToString())
         };
 
-        _logger.LogInformation($"Received a token for a lead with email = {email.Encryptor()}({service})");
+        _logger.LogInformation(_localizer["ReceivedToken", email.Encryptor(), service]);
         return GenerateToken(service, claims);
     }
 
     public string GetTokenForMicroservice(Microservice service)
     {
-        _logger.LogInformation($"{service} service requested to receive a token for microservices");
+        _logger.LogInformation(_localizer["ReceiveTokenForMicroservices", service]);
         return GenerateToken(service);
     }
 
     public bool CheckValidTokenAmongMicroservices(string issuerToken, string audienceToken, Microservice service)
     {
-        _logger.LogInformation($"Received a request to validate a microservices token from {service}");
+        _logger.LogInformation(_localizer["RequestValidateToken", service]);
         var issuerMicroserviceModel = Microservices.Values.FirstOrDefault(t => t.Microservice.ToString().Equals(issuerToken));
         if (issuerMicroserviceModel == null || !issuerMicroserviceModel.ServicesThatHaveAccess.Equals(audienceToken))
         {
-            var ex = new AuthenticationException("Broken token");
-            _logger.LogError(ex, "Token contains invalid data");
+            var ex = new AuthenticationException(_localizer["BrokenToken"]);
+            _logger.LogError(ex, _localizer["TokenContainsInvalidData"]);
             throw ex;
         }
 
         var audiencesFromToken = Regex.Split(audienceToken, ",");
         if (!audiencesFromToken.Contains(service.ToString()))
         {
-            var ex = new ForbiddenException($"You don't have access to {service}");
-            _logger.LogError(ex, $"Not contain from audiences ({ex.Message})");
+            var ex = new ForbiddenException(_localizer["DontHaveAccess", service]);
+            _logger.LogError(ex, _localizer["NotAudiences", ex.Message]);
             throw ex;
         }
 
-        _logger.LogInformation("Verification token was successful");
+        _logger.LogInformation(_localizer["VerificationSuccessful"]);
         return true;
     }
 
     public bool CheckValidTokenFrontend(string issuerToken, string audienceToken, Microservice service)
     {
-        _logger.LogInformation($"Frontend token validation request received({service})");
+        _logger.LogInformation(_localizer["FrontRequestValidateToken", service]);
         if (!issuerToken.Equals(service.ToString()))
         {
-            var ex = new AuthenticationException("Broken token");
-            _logger.LogError(ex, $"The token was not issued for {service} service");
+            var ex = new AuthenticationException(_localizer["BrokenToken"]);
+            _logger.LogError(ex, _localizer["TokenWasNotIssuedForService", service, ex.Message]);
             throw ex;
         }
 
@@ -99,18 +103,18 @@ public class AuthService : IAuthService
         var audiencesFromToken = Regex.Split(audienceToken, ",");
         if (!audiencesFromToken.Contains(frontendFromService))
         {
-            var ex = new ForbiddenException($"{frontendFromService} does not have access");
-            _logger.LogError(ex, $"The token was not issued for {frontendFromService} ({ex.Message})");
+            var ex = new ForbiddenException(_localizer["FrontendDoesntAccess", frontendFromService]);
+            _logger.LogError(ex, _localizer["TokenWasNotIssuedForService", service, ex.Message]);
             throw ex;
         }
 
-        _logger.LogInformation("Verification token was successful");
+        _logger.LogInformation(_localizer["VerificationSuccessful"]);
         return true;
     }
 
     public bool CheckDoubleValidToken(string issuerToken, string audienceToken, Microservice service)
     {
-        _logger.LogInformation($"Token double validation request received({service})");
+        _logger.LogInformation(_localizer["TokenDoubleValidation", service]);
 
         if (issuerToken.Equals(service.ToString()))
             CheckValidTokenFrontend(issuerToken, audienceToken, service);
